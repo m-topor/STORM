@@ -1,0 +1,34 @@
+Meta-Data
+
+This folder has raw data and scripts. In a separate folder called "cleaned_data", the output from the s1_Preprocessing script is placed. 
+The raw data will not be explained in this meta-data document. The s1_Preprocessing script efficiently deals with organising the data to make them ready for planned analyses. 
+
+
+
+-----------------final_wave1.csv--------------------------
+This file has final data derived for wave 1. The data were collected in 2020
+
+ID 
+Progress
+Uni
+Full_Part
+PTY
+Current_Year
+Course_Duration
+Course_Name
+Previous_Training
+Gender
+UKRN
+timepoint
+Perception_Score_Total
+Perception_Score_Mean
+Awareness_Score_Total
+Experience_Score_Total
+Knowledge_Score_Total
+Knowledge_Score_Mean
+crisis_aware
+crisis_learnt
+crisis_explain
+os_explain
+os_learnt
+applicability"
