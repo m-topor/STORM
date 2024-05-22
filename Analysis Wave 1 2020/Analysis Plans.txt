@@ -1,0 +1,57 @@
+Analysis Plans 
+
+----------------------Set 1 _ AllData 
+-----From this dataset, the Binary Categorical outcomes will be included in the model.Here, [crisis explain] and [crisis learnt] will not be inlcuded in statistical models because there are too many missing responses. They will only be described qualitatively.
+
+(1)
+Is there a difference in probability for Yes (1) or No (0) on the variables listed below, based on whether the University is part of the UKRN or not - [UKRN] variable with two categorical levels 
+(2)
+and based on the students' year of study [Current_Year] categorical variable with four levels "Year 1"/"Year 2"/"Placement Year"/"Final Year"
+
+---> These two ubvestigations must be controlled for clustering on the university level
+
+[crisis_learnt] - logistic regression with both random effects for universities and clusters
+[os_learnt] - logistic regression with both random effects for universities and clusters
+[os_explain] - logistic regression with both random effects for universities and clusters
+[applicability] - logistic regression with both random effects for universities and clusters
+
+We will include a dummy variable for the cluster (the dummy variable will tell us if we can see the difference in the probability of yes and no)
+
+
+----------------------Set 2: Awareness, Experience, ConceptualPerception & SituatinalPerception------------------
+-----For Set 2 - there are four data files for four main outcomes: Awareness, Experience, Conceptual Perception and Situatonal Perception
+We will first address Awareness and Experience. Both variables are count variables on a scale of 0 to 8.
+
+(1)
+Is there a difference in the count of open science practices in the variables listed below, based on whether the University is part of the UKRN or not - [UKRN] variable with two categorical levels 
+(2)
+and based on the students' year of study [Current_Year] categorical variable with four levels "Year 1"/"Year 2"/"Placement Year"/"Final Year"
+---> These two ubvestigations must be controlled for clustering on the university level
+
+[Awareness_Score_Total] - this is a count variable between 0 and 8 - truncated Poisson regression with random effects for universities and clusters
+
+[Experience_Score_Total] - this is a count variable between 0 and 8 - truncated Poisson regression with random effects for universities and clusters
+
+We will include a dummy variable for the cluster (the dummy variable will tell us if we can see the difference in the expected number)
+
+
+------- Next, we will address Conceptual Perception and Situatonal Perception. Both variables are mean values between -2 and 2 reflecting positive and negative perceptions of open science practices.
+
+(1)
+Is there a difference in the perception of open science practices in the variables listed below, based on whether the University is part of the UKRN or not - [UKRN] variable with two categorical levels 
+(2)
+and based on the students' year of study [Current_Year] categorical variable with four levels "Year 1"/"Year 2"/"Placement Year"/"Final Year"
+---> These two ubvestigations must be controlled for clustering on the university level
+
+
+[Perception_Score_Mean] - this is the conceptual perception - beta linear regression where we change the scores by adding 2 and changing the limits to between 0 and 4. Then the average value would be divided by 4 to reflect a percentage. Values above 50% would be positive and below would be negative. 
+
+[Knowledge_Score_Mean] - this is the situational perception - truncated linear regression with random effects for universities and clusters
+
+We will include a dummy variable for the cluster (the dummy variable will tell us if we can see difference in the expected value between the two clutsers - could also look at differences in variance)
+
+(here for the situational perceptions scale where participants scored all positives and the total is 32, it won't fit the distribution and we will have to take away a small number - 0.001 
+
+
+
+ 

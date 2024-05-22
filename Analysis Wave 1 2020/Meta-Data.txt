@@ -4,31 +4,110 @@ This folder has raw data and scripts. In a separate folder called "cleaned_data"
 The raw data will not be explained in this meta-data document. The s1_Preprocessing script efficiently deals with organising the data to make them ready for planned analyses. 
 
 
-
 -----------------final_wave1.csv--------------------------
 This file has final data derived for wave 1. The data were collected in 2020
 
-ID 
-Progress
-Uni
-Full_Part
-PTY
-Current_Year
-Course_Duration
-Course_Name
-Previous_Training
-Gender
-UKRN
-timepoint
-Perception_Score_Total
-Perception_Score_Mean
-Awareness_Score_Total
-Experience_Score_Total
-Knowledge_Score_Total
-Knowledge_Score_Mean
-crisis_aware
-crisis_learnt
-crisis_explain
-os_explain
-os_learnt
-applicability"
+------------General Data------------------
+
+[ID] --- Numerical - Participant's number in the database
+[Progress] --- Numerical - A whole number between 0 and 100 reflecting percentages. How much of the questionnaire did the participant complete, 
+[Uni] --- Categorical - What university is the student at, the universities are anonymised. The codes are composed of letters and numbers. Universities with code "UKRN" belong to the UK Reproducibility Network, those with the code "UNI" do not belong to the UKRN.
+[PTY] --- Categorical - Yes/No/Other - For the Psychologty BSc programme that the student is enrolled on, is a Professional Placement Year (a year out to gain work experience) part of the course?
+[Current_Year] --- Categorical - "Year 1"/"Year 2"/"Placement Year"/"Final Year" - When completing the survey, which year of study was the student in
+[Course_Duration] --- Numerical - Between 1 and 4. How many years is the Bachelor course in total. 
+[Course_Name] --- Open text - Students get to write the name of their Bachelor level Psychology course.[
+[Previous_Training] --- Bianry Categrical - "Yes"/"No" - Did the student study psychology before coming to university?
+[Gender] --- Categorical - Open text. Participant wrote down the gender they identify with. 
+[UKRN] --- Binary Categrical- "UKRN"/"Non-UKRN" - Is the university that the student attends a member of the UK Reproducibility Network?
+[timepoint] --- Numerical - 1 - The time-point reflects the data collection wave out of 3 in the whole poject. Wave 1 was in 2020, wave 2 in 2021 and wave 3 in 2022. All of the data here is from 2020 so timepoint 1. 
+
+-------------Outcome Variables--------------
+
+------For the perception variable, students were asked to respond on a 5-point likert scale from Strongly Disagree to Strongly Agree. The statements they read were about whether some open science practices are to be perceived posisitevly or negatively. There are 16 items altogether on 8 different open science practices. There are two items per open science practice and for each, one item is reverse coded (i.e. positive perceptions are reflected when the student disagrees with the statement). The responses were scored to reflect the positive and negative perceptions as follows: Strongly Disagree -2, Disagree -1, Have no opinion = 0, Agree = 1, Strongly Agree = 2
+
+[Perception_Replication1] - Item on replication
+[Perception_Replication2] - Reverse item on replication
+[Perception_Materials1] - Item on open materials
+[Perception_Materials2] - Reverse item on open materials
+[Perception_Education1] - Item on open educational materials
+[Perception_Education2] - Reverse item on open educational materials
+[Perception_Access1] - Item on open access publications
+[Perception_Access2] - Reverse item on open access publications
+[Perception_Data1] - Item on open data
+[Perception_Data2] - Reverse item on open data
+[Perception_Power1] - Item on a-priori power analysis
+[Perception_Power2] - Reverse item on a-priori power analysis
+[Perception_Preregistration1] - Item on study preregistration 
+[Perception_Preregistration2] - Reverse item on study preregistration
+[Perception_Preprint1] - Item on preprinting study results
+[Perception_Preprint2] - Reverse item on preprinting study results
+
+-----For the Knowledge variables, these are called Situational Perceptions in the paper. Here students were given scenarios, to which they were asked to respond using the same Likert scale as above. There are 8 items on 8 different open science practices. There is only one item per open science practice. Some items are reverse coded (i.e. positive perceptions are reflected when the student disagrees with the statement). The responses were scored to reflect the positive and negative perceptions as follows: Strongly Disagree -2, Disagree -1, Have no opinion = 0, Agree = 1, Strongly Agree = 2
+   
+[Knowledge_Replication] - Scenario with an example of study replication
+[Knowledge_Materials] - Reverse scenario with an example of open materials
+[Knowledge_Education] - Scenario with an example of open educational materials
+[Knowledge_Access] - Reverse scenario with an example of open access publications
+[Knowledge_Data] - Reverse scenario with an example of open data
+[Knowledge_Power] - Scenario with an example of a-priori power analysis
+[Knowledge_Preregistration] - Reverse scenario with an example of study preregistration
+[Knowledge_Preprint] - Scenario with an example of preprinting study results
+
+-----For the awareness varibales, participants were asked to select from a list all open research practices that they have heard about. The answer for each item was either left blank or marked "I have heard of this". In the data, these responses are marked as 0 for blank and 1 for "I have heard of this".There are 8 items on 8 different open science practices. There is only one item per open science practice.
+
+[Awareness_Replication] - Have you heard of study replications
+[Awareness_Materials] - Have you heard of open materials
+[Awareness_Education]  - Have you heard of open educational materials
+[Awareness_Access] - Have you heard of open access publications
+[Awareness_Data] - Have you heard of open data
+[Awareness_Power] - Have you heard of a-priori power analysis
+[Awareness_Preregistration] - Have you heard of study preregistration
+[Awareness_Preprint] - Have you heard of preprinting study results
+
+-----For the Experience varibales, participants were asked to select from a list all open research practices that they have used. The answer for each item was either left blank or marked "I have done/used this". In the data, these responses are marked as 0 for blank and 1 for "I have done/used this".There are 8 items on 8 different open science practices. There is only one item per open science practice.
+
+[Experience_Replication] - Have you done/used study replications
+[Experience_Materials] - Have you done/used open materials
+[Experience_Education] - Have you done/used open educational materials
+[Experience_Access] - Have you done/used open access publications
+[Experience_Data] - Have you done/used open data
+[Experience_Power] - Have you done/used a-priori power analysis
+[Experience_Preregistration] - Have you done/used study preregistration
+[Experience_Preprint] - Have you done/used preprinting of study results
+
+------Scale scores
+
+[Perception_Score_Total] - Summed perceptions of open science practices. 
+[Perception_Score_Mean] - The mean representing the perceptions of open science practices - if the number is positive, then the perceptions are overall positive
+[Knowledge_Score_Total] - Summed situational perceptions of open science practices
+[Knowledge_Score_Mean] - The mean representing the situational perceptions of open science practices - if the number is positive, then the situational perceptions are overall positive
+[Awareness_Score_Total] - Summed number of open science practices that the students have heard of/are aware of
+[Experience_Score_Total] - Summed number of open science practices that the students have used or done themselves
+
+------Bianary Categorical variables
+[crisis_aware] - have you heard of the reproducibility crists Yes = 1, No = 0 
+[crisis_learnt] -  have you heard of the reproducibility crists Yes = 1, No = 0 
+[crisis_explain] - this was originally an open text variable, which was later coded by the research team as either correct (1) or incorrect (0)
+[os_explain] - could you explain "open research" Yes = 1, No = 0 
+[os_learnt] - did you learn about "open research" Yes = 1, No = 0
+[applicability] - are the issues raised in the questionnaire relevant to you Yes = 1, No = 0
+
+
+[comments] - an open text box that the students used to leave comments
+
+
+
+These same data are divided into separate files to make it easier to operate on the data for visualisation and analyses: 
+
+	Set1_AllData.csv - Has all six data with binary categorical responses: [crisis_aware], [crisis_learnt], [crisis_explain], [os_explain], [os_learnt], [applicability]. These analyses will be performed first 
+
+	Set2_Awareness.csv - Has all data that are relevant to the outcome [Awareness_Score_Total] 
+
+	Set2_Experience.csv - Has all data that are relevant to the outcome [Experience_Score_Total] 
+
+	Set2_ConceptualPerception.csv - Has all data that are relevant to the outcome [Perception_Score_Mean]
+
+	Set2_SituationalPerception.csv - Has all data that are relevant to the outcome [Knowledge_Score_Mean]
+  
+
+

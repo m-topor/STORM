@@ -216,8 +216,9 @@ final_df <- final_df[final_df$Uni != "Other" & final_df$Uni != "UNI27",]
 
 #Final sample 842
 
+table(final_df$UKRN)
 
-
+#407 non-UKRN and 435 in UKRN
 
 # ------- VARIABLE PREP ----
 
@@ -262,13 +263,13 @@ final_df <- recode2(final_df, fields = c('Experience_1', 'Experience_2', 'Experi
 #Knowledge of Open Research - standard scoring
 final_df <- recode2(final_df, fields = c('Knowledge_1', 'Knowledge_3', 'Knowledge_6', 
                                                        'Knowledge_8'), 
-                           recodes = "'Strongly disagree' = 0; 'Strongly Disagree' = 0; 'Disagree' = 1; 
-                           'Have no opinion' = 2; 'Agree' = 3; 'Strongly Agree' = 4; 'Strongly agree' = 4")
+                           recodes = "'Strongly disagree' = -2; 'Strongly Disagree' = -2; 'Disagree' = -1; 
+                           'Have no opinion' = 0; 'Agree' = 1; 'Strongly Agree' = 2; 'Strongly agree' = 2")
 #Knowledge of Open Research - reverse coded items
 final_df <- recode2(final_df, fields = c('Knowledge_2', 'Knowledge_4', 'Knowledge_5', 
                                                        'Knowledge_7'), 
-                           recodes = "'Strongly disagree' = 4; 'Strongly Disagree' = 4; 'Disagree' = 3; 
-                           'Have no opinion' = 2; 'Agree' = 1; 'Strongly Agree' = 0; 'Strongly agree' = 0")
+                           recodes = "'Strongly disagree' = 2; 'Strongly Disagree' = 2; 'Disagree' = 1; 
+                           'Have no opinion' = 0; 'Agree' = -1; 'Strongly Agree' = -2; 'Strongly agree' = -2")
 
 #Secondary DVs with yes/no/notsure answers
 final_df <- recode2(final_df, fields = c('crisis_aware', 'crisis_learnt', 'os_explain', 
@@ -376,15 +377,21 @@ final_df$crisis_explain_Completed[final_df$crisis_explain == 9999] <- 0
 
 #Restructure the columns so that they make more sense
 #Removed columns that are redundant - Duration_Seconds, PTY_Other, Finished, Course_Duration_Other, Current_Year_Other, all individual scale scores, all columns marking exclusion
-final_df_all <- final_df
+final_df_all <- final_df #save all of the columns just in case needed later
 
 final_df <- final_df %>% 
-  dplyr::select("ID", "Progress", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Perception_Score_Total", "Perception_Score_Mean", "Knowledge_Score_Total", "Knowledge_Score_Mean", "Awareness_Score_Total", "Experience_Score_Total", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "applicability", "comments")
+  dplyr::select("ID", "Progress", "Uni", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Perception_1", "Perception_2", "Perception_3", "Perception_4",  "Perception_5", 
+                "Perception_6", "Perception_7", "Perception_8", "Perception_9", "Perception_10", "Perception_11", "Perception_12", "Perception_13", "Perception_14",  "Perception_15", "Perception_16", "Knowledge_1", "Knowledge_2", "Knowledge_3", 
+                "Knowledge_4", "Knowledge_5", "Knowledge_6", "Knowledge_7", "Knowledge_8", "Awareness_1", "Awareness_2", "Awareness_3", "Awareness_4", "Awareness_5", "Awareness_6", "Awareness_7", "Awareness_8", "Experience_1", "Experience_2", 
+                "Experience_3", "Experience_4", "Experience_5", "Experience_6", "Experience_7", "Experience_8", "Perception_Score_Total", "Perception_Score_Mean", "Knowledge_Score_Total", "Knowledge_Score_Mean",  "Awareness_Score_Total", "Experience_Score_Total", 
+                "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "applicability", "comments")
 
-setwd("C:/Users/marto05/OneDrive - Linköpings universitet/10. Side projects/2. STORM/STORM/Analysis Wave 1 2020/cleaned_data")
-write.csv(final_df, "final_wave1.csv")
-
-setwd("C:/Users/marto05/OneDrive - Linköpings universitet/10. Side projects/2. STORM/STORM/Analysis Wave 1 2020")
+colnames(final_df) <- c("ID", "Progress", "Uni", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Perception_Replication1", "Perception_Replication2", "Perception_Materials1", "Perception_Materials2",  "Perception_Education1", 
+                        "Perception_Education2", "Perception_Access1", "Perception_Access2", "Perception_Data1", "Perception_Data2", "Perception_Power1", "Perception_Power2", "Perception_Preregistration1", "Perception_Preregistration2",  "Perception_Preprint1", "Perception_Preprint2", "Knowledge_Replication", 
+                        "Knowledge_Materials", "Knowledge_Education", "Knowledge_Access", "Knowledge_Data", "Knowledge_Power", "Knowledge_Preregistration", "Knowledge_Preprint", "Awareness_Replication", "Awareness_Materials", "Awareness_Education", "Awareness_Access", "Awareness_Data", "Awareness_Power", "Awareness_Preregistration", 
+                        "Awareness_Preprint", "Experience_Replication", "Experience_Materials", "Experience_Education", "Experience_Access", "Experience_Data", "Experience_Power", "Experience_Preregistration", "Experience_Preprint", "Perception_Score_Total", "Perception_Score_Mean", "Knowledge_Score_Total", "Knowledge_Score_Mean",  "Awareness_Score_Total", "Experience_Score_Total", 
+                        "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "applicability", "comments")
+final_df$crisis_explain[final_df$crisis_explain == 9999] <- NA
 
 
 #--------------MAKE SEPARATE DFs FOR OUTCOMES --------------------
@@ -399,7 +406,7 @@ setwd("C:/Users/marto05/OneDrive - Linköpings universitet/10. Side projects/2. 
 #This one has a lot of missing data but I did not remove any because these are single questions not forming any sub-scales
 Set1_AllData <- final_df_all %>%
   dplyr::select("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "applicability", "crisis_aware_Completed", "crisis_learnt_Completed", "crisis_explain_Completed", "os_explain_Completed", "os_learnt_Completed", "applicability_Completed")
-Set1_AllData[Set1_AllData$crisis_explain == 9999,] <- NA
+Set1_AllData$crisis_explain[Set1_AllData$crisis_explain == 9999] <- NA
 
 # Set 2 of Analyses
 
@@ -420,33 +427,36 @@ Set2_ConceptualPerception <- final_df_all %>%
 Set2_ConceptualPerception <- Set2_ConceptualPerception[Set2_ConceptualPerception$Perception_Completed == 1, ]
 colnames(Set2_ConceptualPerception) <- c("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Perception_Replication1", "Perception_Replication2", "Perception_Materials1", "Perception_Materials2",  "Perception_Education1", 
 "Perception_Education2", "Perception_Access1", "Perception_Access2", "Perception_Data1", "Perception_Data2", "Perception_Power1", "Perception_Power2", "Perception_Preregistration1", "Perception_Preregistration2",  "Perception_Preprint1", "Perception_Preprint2", "Perception_Score_Total", "Perception_Score_Mean", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Perception_Completed")
-Set2_ConceptualPerception[Set2_ConceptualPerception$crisis_explain == 9999,] <- NA 
+Set2_ConceptualPerception$crisis_explain[Set2_ConceptualPerception$crisis_explain == 9999] <- NA 
 
 Set2_SituationalPerception <- final_df_all %>% 
   dplyr::select("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Knowledge_1", "Knowledge_2", "Knowledge_3", "Knowledge_4", "Knowledge_5", "Knowledge_6", "Knowledge_7", "Knowledge_8", "Knowledge_Score_Total", "Knowledge_Score_Mean", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Knowledge_Completed")
 Set2_SituationalPerception <- Set2_SituationalPerception[Set2_SituationalPerception$Knowledge_Completed == 1,]
 colnames(Set2_SituationalPerception) <- c("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Knowledge_Replication", "Knowledge_Materials", "Knowledge_Education", "Knowledge_Access", "Knowledge_Data", "Knowledge_Power", "Knowledge_Preregistration", "Knowledge_Preprint", "Knowledge_Score_Total", "Knowledge_Score_Mean", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Knowledge_Completed") 
-Set2_SituationalPerception[Set2_SituationalPerception$crisis_explain == 9999,] <- NA
+Set2_SituationalPerception$crisis_explain[Set2_SituationalPerception$crisis_explain == 9999] <- NA
 
 Set2_Awareness <- final_df_all %>% 
   dplyr::select("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Awareness_1", "Awareness_2", "Awareness_3", "Awareness_4", "Awareness_5", "Awareness_6", "Awareness_7", "Awareness_8", "Awareness_Score_Total", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Awareness_Completed")
 Set2_Awareness <- Set2_Awareness[Set2_Awareness$Awareness_Completed == 1,]
 colnames(Set2_Awareness) <- c("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Awareness_Replication", "Awareness_Materials", "Awareness_Education", "Awareness_Access", "Awareness_Data", "Awareness_Power", "Awareness_Preregistration", "Awareness_Preprint", "Awareness_Score_Total", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Awareness_Completed")
-Set2_Awareness[Set2_Awareness$crisis_explain == 9999,] <- NA
+Set2_Awareness$crisis_explain[Set2_Awareness$crisis_explain == 9999] <- NA
   
 Set2_Experience <- final_df_all %>% 
   dplyr::select("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Experience_1", "Experience_2", "Experience_3", "Experience_4", "Experience_5", "Experience_6", "Experience_7", "Experience_8", "Experience_Score_Total", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Experience_Completed") 
 Set2_Experience <- Set2_Experience[Set2_Experience$Experience_Completed == 1,]
 colnames(Set2_Experience) <- c("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Experience_Replication", "Experience_Materials", "Experience_Education", "Experience_Access", "Experience_Data", "Experience_Power", "Experience_Preregistration", "Experience_Preprint", "Experience_Score_Total", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Experience_Completed") 
-Set2_Experience[Set2_Experience$crisis_explain == 9999,] <- NA
+Set2_Experience$crisis_explain[Set2_Experience$crisis_explain == 9999] <- NA
+
 
 
 setwd("C:/Users/marto05/OneDrive - Linköpings universitet/10. Side projects/2. STORM/STORM/Analysis Wave 1 2020/cleaned_data")
-write.csv(Set1_AllData, "Set1_AllData.csv")
-write.csv(Set2_ConceptualPerception, "Set2_ConceptualPerception.csv")
-write.csv(Set2_SituationalPerception, "Set2_SituationalPerception.csv")
-write.csv(Set2_Awareness, "Set2_Awareness.csv")
-write.csv(Set2_Experience, "Set2_Experience.csv")
+write.csv(Set1_AllData, "Set1_AllData.csv", row.names = FALSE)
+write.csv(Set2_ConceptualPerception, "Set2_ConceptualPerception.csv", row.names = FALSE)
+write.csv(Set2_SituationalPerception, "Set2_SituationalPerception.csv", row.names = FALSE)
+write.csv(Set2_Awareness, "Set2_Awareness.csv", row.names = FALSE)
+write.csv(Set2_Experience, "Set2_Experience.csv", row.names = FALSE)
+
+write.csv(final_df, "final_wave1.csv", row.names = FALSE)
 
 setwd("C:/Users/marto05/OneDrive - Linköpings universitet/10. Side projects/2. STORM/STORM/Analysis Wave 1 2020")
 
