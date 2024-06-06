@@ -1,0 +1,367 @@
+---
+title: "Wave 1 Statistical Analyses"
+output: pdf_document
+author: Marta Topor & Bertil Wegmann
+date: June 2024
+---
+
+```{r setup, include=FALSE, echo = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(rstan)
+```
+
+# Hierarchical Bayesian Models Wave 1
+
+This document runs the models used to analyse the main outcomes for Wave 1.   
+The structure of the document follows the Analysis Plans.txt file.   
+The variables and outcome variables are outlined in Meta-Data.txt.  
+<!-- ADD DETAILS The STAN files with the model formulas are...--> 
+  
+
+## Data Set 1 - Binary Categorical Outcomes
+  
+### Crisis aware 
+
+Bayesian Logistic regression for whether participants were aware of the reproducibility crisis or not (yes/no). 
+The explainer variables are:  
+  -  Whether the participant was at a university that was affiliated with the UKRN
+  -  whether the participant was in their first, second, placement of third year  
+    
+Bayesian model for UKRN/Non-UKRN:
+
+
+```{r Set_1 Crisis Aware}
+
+#Set the path for the Wave 1 files
+
+project_path <- gsub("/stats","", getwd())
+
+#Read the data
+data <- read.csv(paste(project_path, "/cleaned_data/Set1_AllData.csv", sep = "")) 
+
+# Logistic multilevel model simulations
+
+Index <- !is.na(data$crisis_aware)
+y <- data$crisis_aware[Index]
+N <- length(y) # The number of observations
+
+IDuni <- as.factor(data$Uni[Index]) #list the UNI for each participant
+tmp <- sort(unique(IDuni)) #make a list of the unique UNIs
+
+ll <- vector(length=N)
+
+for (ii in 1:N){
+  index2 <- IDuni[ii]==tmp
+  ll[ii] <- which(index2 == TRUE) #mark which UNI per participant by factor and not the UNI name
+}
+
+L <- length(unique(ll)) # number of universities
+
+D <- ifelse(data$UKRN[Index]=="UKRN",1,0) # mark universities as DKRN or not
+
+n_group <- N/L # number of observations per group
+alpha_ll <- vector(length=N)
+counter <- 1
+
+for (ii in 1:L){
+  #ll[counter:(counter+n_group-1)] <- ii --------- this I think reassigns the labels for uni factors and I am not convinced that it works well because it's already done in line 54
+  
+  alpha_ll[counter:(counter+n_group-1)] <- rnorm(1) #make normal distribution for the different universities
+  counter <- counter + n_group
+}
+
+#I think that these two lines can also be removed as they are from simulations not real data
+#prob_logit <- exp(alpha_ll + 1*D)/(1+exp(alpha_ll + 1*D)) #probability distribution between 0 and 1 
+#y <- rbinom(N,1,prob_logit) #binary distribution
+
+
+# Estimate logistic multilevel model
+data2 <- list(N=N, L=L, y=y, ll=ll, D=D)
+warmup <- 1000
+niter <- 2000
+fit <- stan(file="STORM_logistic.stan",data=data2, warmup=warmup,iter=niter,chains=4)
+
+print(fit)
+
+```
+The output shows that beta credibility intervals cross 0.  
+2.5% = -0.19  
+97.5% = 2.13    
+So the interpretation is that students who attend a UKRN affiliated university are not more likely to be aware of the reproducibility crisis.  
+  
+To see the magnitude of this difference. 
+```{r Crisis Aware effect}
+ParDraws <- extract(fit)
+ lambda_UKRN <- exp(ParDraws$mu + ParDraws$beta*1)
+ lambda_NonUKRN <- exp(ParDraws$mu)
+ plot(density(lambda_UKRN),col="blue")
+ lines(density(lambda_NonUKRN),col="red")
+ mean(lambda_UKRN > lambda_NonUKRN)
+```
+Mean lambda for students in Non-UKRN university = 1.33    
+Mean lambda for students in a UKRN university = 3.56  
+Difference = 0.95  
+<!-- ? How to explain Lambda in the paper? --> 
+
+Bayesian model for differences in year groups. 
+
+```{r Set_1 Crisis Aware}
+
+# This does not work
+
+
+X <- as.data.frame(cbind(data$ID[Index], data$Current_Year[Index]))
+X$V2[X$V2 == 'Year 1'] <- 1
+X$V2[X$V2 == 'Year 2'] <- 2
+X$V2[X$V2 == 'Placement Year'] <- 2.5
+X$V2[X$V2 == 'Final Year'] <- 3
+X$V2 <- as.numeric(X$V2)
+p <- length(unique(X$V2)) 
+
+
+
+# Estimate logistic multilevel model
+data2 <- list(N=N, L=L, y=y, ll=ll, X=X, p=p)
+warmup <- 1000
+niter <- 2000
+fit <- stan(file="STORM_logistic_alt2.stan",data=data2, warmup=warmup,iter=niter,chains=4)
+
+print(fit)
+```
+
+
+
+
+### Learnt Open Science at Uni 
+
+Bayesian Logistic regression for whether participants received teaching about open science or not (yes/no). 
+The explainer variables are:  
+  -  Whether the participant was at a university that was affiliated with the UKRN
+  -  whether the participant was in their first, second, placement of third year  
+    
+Bayesian model for UKRN/Non-UKRN:
+
+
+```{r Set_1 OS Learnt}
+
+# Logistic multilevel model simulations
+
+Index <- !is.na(data$os_learnt)
+y <- data$os_learnt[Index]
+N <- length(y) # The number of observations
+
+IDuni <- as.factor(data$Uni[Index]) #list the UNI for each participant
+tmp <- sort(unique(IDuni)) #make a list of the unique UNIs
+
+ll <- vector(length=N)
+
+for (ii in 1:N){
+  index2 <- IDuni[ii]==tmp
+  ll[ii] <- which(index2 == TRUE) #mark which UNI per participant by factor and not the UNI name
+}
+
+L <- length(unique(ll)) # number of universities
+
+D <- ifelse(data$UKRN[Index]=="UKRN",1,0) # mark universities as DKRN or not
+
+n_group <- N/L # number of observations per group
+alpha_ll <- vector(length=N)
+counter <- 1
+
+for (ii in 1:L){
+  #ll[counter:(counter+n_group-1)] <- ii --------- this I think reassigns the labels for uni factors and I am not convinced that it works well because it's already done above
+  
+  alpha_ll[counter:(counter+n_group-1)] <- rnorm(1) #make normal distribution for the different universities
+  counter <- counter + n_group
+}
+
+#I think that these two lines can also be removed as they are from simulations not real data
+#prob_logit <- exp(alpha_ll + 1*D)/(1+exp(alpha_ll + 1*D)) #probability distribution between 0 and 1 
+#y <- rbinom(N,1,prob_logit) #binary distribution
+
+
+# Estimate logistic multilevel model
+data2 <- list(N=N, L=L, y=y, ll=ll, D=D)
+warmup <- 1000
+niter <- 2000
+fit <- stan(file="STORM_logistic.stan",data=data2, warmup=warmup,iter=niter,chains=4)
+
+print(fit)
+
+```
+The output shows that beta credibility intervals do not cross 0.  
+2.5% = 0.14  
+97.5% = 1.90  
+So the interpretation is that students who attend a UKRN affiliated university are more likely to have learnt about open science.  
+  
+To see the magnitude of this difference. 
+```{r OS Learnt effect}
+ParDraws <- extract(fit)
+ 
+ lambda_UKRN <- exp(ParDraws$mu + ParDraws$beta*1)
+ lambda_NonUKRN <- exp(ParDraws$mu)
+ plot(density(lambda_UKRN),col="blue")
+ lines(density(lambda_NonUKRN),col="red")
+ mean(lambda_UKRN > lambda_NonUKRN)
+```
+Mean lambda for students in Non-UKRN university = 0.17    
+Mean lambda for students in a UKRN university = 0.48  
+Difference = 0.986  
+<!-- ? How to explain Lambda in the paper? --> 
+
+
+### Can explain open science
+
+Bayesian Logistic regression for whether participants can explain what open science is (yes/no). 
+The explainer variables are:  
+  -  Whether the participant was at a university that was affiliated with the UKRN
+  -  whether the participant was in their first, second, placement of third year  
+    
+Bayesian model for UKRN/Non-UKRN:
+
+
+```{r Set_1 OS Explain}
+
+# Logistic multilevel model simulations
+
+Index <- !is.na(data$os_explain)
+y <- data$os_explain[Index]
+N <- length(y) # The number of observations
+
+IDuni <- as.factor(data$Uni[Index]) #list the UNI for each participant
+tmp <- sort(unique(IDuni)) #make a list of the unique UNIs
+
+ll <- vector(length=N)
+
+for (ii in 1:N){
+  index2 <- IDuni[ii]==tmp
+  ll[ii] <- which(index2 == TRUE) #mark which UNI per participant by factor and not the UNI name
+}
+
+L <- length(unique(ll)) # number of universities
+
+D <- ifelse(data$UKRN[Index]=="UKRN",1,0) # mark universities as DKRN or not
+
+n_group <- N/L # number of observations per group
+alpha_ll <- vector(length=N)
+counter <- 1
+
+for (ii in 1:L){
+  #ll[counter:(counter+n_group-1)] <- ii --------- this I think reassigns the labels for uni factors and I am not convinced that it works well because it's already done in line 54
+  
+  alpha_ll[counter:(counter+n_group-1)] <- rnorm(1) #make normal distribution for the different universities
+  counter <- counter + n_group
+}
+
+#I think that these two lines can also be removed as they are from simulations not real data
+#prob_logit <- exp(alpha_ll + 1*D)/(1+exp(alpha_ll + 1*D)) #probability distribution between 0 and 1 
+#y <- rbinom(N,1,prob_logit) #binary distribution
+
+
+# Estimate logistic multilevel model
+data2 <- list(N=N, L=L, y=y, ll=ll, D=D)
+warmup <- 1000
+niter <- 2000
+fit <- stan(file="STORM_logistic.stan",data=data2, warmup=warmup,iter=niter,chains=4)
+
+print(fit)
+
+```
+The output shows that beta credibility intervals do cross 0.  
+2.5% = -0.10  
+97.5% = 0.63  
+So the interpretation is that students who attend a UKRN affiliated university are not more likely to correctly explain open science.  
+  
+To see the magnitude of this difference. 
+```{r OS Explain effect}
+ParDraws <- extract(fit)
+ 
+ lambda_UKRN <- exp(ParDraws$mu + ParDraws$beta*1)
+ lambda_NonUKRN <- exp(ParDraws$mu)
+ plot(density(lambda_UKRN),col="blue")
+ lines(density(lambda_NonUKRN),col="red")
+ mean(lambda_UKRN > lambda_NonUKRN)
+```
+Mean lambda for students in Non-UKRN university = 0.30    
+Mean lambda for students in a UKRN university = 0.47  
+Difference = 0.95  
+<!-- ? How to explain Lambda in the paper? --> 
+
+
+### Applicability
+
+Bayesian Logistic regression for whether participants think that the issues discussed in the questionnaire are relevant to them. 
+The explainer variables are:  
+  -  Whether the participant was at a university that was affiliated with the UKRN
+  -  whether the participant was in their first, second, placement of third year  
+    
+Bayesian model for UKRN/Non-UKRN:
+
+
+```{r Set_1 OS Explain}
+
+# Logistic multilevel model simulations
+
+Index <- !is.na(data$applicability)
+y <- data$applicability[Index]
+N <- length(y) # The number of observations
+
+IDuni <- as.factor(data$Uni[Index]) #list the UNI for each participant
+tmp <- sort(unique(IDuni)) #make a list of the unique UNIs
+
+ll <- vector(length=N)
+
+for (ii in 1:N){
+  index2 <- IDuni[ii]==tmp
+  ll[ii] <- which(index2 == TRUE) #mark which UNI per participant by factor and not the UNI name
+}
+
+L <- length(unique(ll)) # number of universities
+
+D <- ifelse(data$UKRN[Index]=="UKRN",1,0) # mark universities as DKRN or not
+
+n_group <- N/L # number of observations per group
+alpha_ll <- vector(length=N)
+counter <- 1
+
+for (ii in 1:L){
+  #ll[counter:(counter+n_group-1)] <- ii --------- this I think reassigns the labels for uni factors and I am not convinced that it works well because it's already done in line 54
+  
+  alpha_ll[counter:(counter+n_group-1)] <- rnorm(1) #make normal distribution for the different universities
+  counter <- counter + n_group
+}
+
+#I think that these two lines can also be removed as they are from simulations not real data
+#prob_logit <- exp(alpha_ll + 1*D)/(1+exp(alpha_ll + 1*D)) #probability distribution between 0 and 1 
+#y <- rbinom(N,1,prob_logit) #binary distribution
+
+
+# Estimate logistic multilevel model
+data2 <- list(N=N, L=L, y=y, ll=ll, D=D)
+warmup <- 1000
+niter <- 2000
+fit <- stan(file="STORM_logistic.stan",data=data2, warmup=warmup,iter=niter,chains=4)
+
+print(fit)
+
+```
+The output shows that beta credibility intervals do cross 0.  
+2.5% = -1.06  
+97.5% = 0.30  
+So the interpretation is that students who attend a UKRN affiliated university are not more likely to correctly explain open science.  
+  
+To see the magnitude of this difference. 
+```{r Applicability effect}
+ParDraws <- extract(fit)
+ 
+ lambda_UKRN <- exp(ParDraws$mu + ParDraws$beta*1)
+ lambda_NonUKRN <- exp(ParDraws$mu)
+ plot(density(lambda_UKRN),col="blue")
+ lines(density(lambda_NonUKRN),col="red")
+ mean(lambda_UKRN > lambda_NonUKRN)
+```
+Mean lambda for students in Non-UKRN university = 13.57    
+Mean lambda for students in a UKRN university = 13.38  
+Difference = 0.46  
+<!-- ? How to explain Lambda in the paper? --> 

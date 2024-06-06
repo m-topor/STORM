@@ -10,7 +10,7 @@ and based on the students' year of study [Current_Year] categorical variable wit
 
 ---> These two ubvestigations must be controlled for clustering on the university level
 
-[crisis_learnt] - logistic regression with both random effects for universities and clusters
+[crisis_aware] - logistic regression with both random effects for universities and clusters
 [os_learnt] - logistic regression with both random effects for universities and clusters
 [os_explain] - logistic regression with both random effects for universities and clusters
 [applicability] - logistic regression with both random effects for universities and clusters

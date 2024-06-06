@@ -416,7 +416,7 @@ Set1_AllData$crisis_explain[Set1_AllData$crisis_explain == 9999] <- NA
 
 #QUESTION
 # Perhaps with these we could also add the variables on crisis aware, crisis learn, crisis explain, open science explain, open science learn as explainer variables
-# But there is quite a lot of missing data here
+# But there is quite a lot of missing data here for crisis explain and crisis learnt
 
 #WITHIN-SUBJECT ANALYSES 
 # Comparing responses to Replication, Materials, Education, Access, Data, Power, Preregistration, Preprint
