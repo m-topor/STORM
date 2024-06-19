@@ -1,21 +1,20 @@
 Analysis Plans 
 
 ----------------------Set 1 _ AllData 
------From this dataset, the Binary Categorical outcomes will be included in the model.Here, [crisis explain] and [crisis learnt] will not be inlcuded in statistical models because there are too many missing responses. They will only be described qualitatively.
+-----From this dataset, the Binary Categorical outcomes will be included in the model. Here, [crisis explain] and [crisis learnt] will not be inlcuded in statistical models because there are too many missing responses. They will only be described qualitatively.
 
 (1)
 Is there a difference in probability for Yes (1) or No (0) on the variables listed below, based on whether the University is part of the UKRN or not - [UKRN] variable with two categorical levels 
 (2)
-and based on the students' year of study [Current_Year] categorical variable with four levels "Year 1"/"Year 2"/"Placement Year"/"Final Year"
+and based on the students' year of study [Current_Year] numerical variable with four levels [1] = Year 1 [2] = Year 2 [2.5] = Placement Year and [3] == Final Year
 
----> These two ubvestigations must be controlled for clustering on the university level
+---> These two questions will be answered in one model + there will be an addition of an interaction between [UKRN] and the [Current_Year] variables. 
+The UKRN variable will be a dummy variable with with two levels - 1 and 0
 
 [crisis_aware] - logistic regression with both random effects for universities and clusters
 [os_learnt] - logistic regression with both random effects for universities and clusters
 [os_explain] - logistic regression with both random effects for universities and clusters
 [applicability] - logistic regression with both random effects for universities and clusters
-
-We will include a dummy variable for the cluster (the dummy variable will tell us if we can see the difference in the probability of yes and no)
 
 
 ----------------------Set 2: Awareness, Experience, ConceptualPerception & SituatinalPerception------------------
