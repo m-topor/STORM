@@ -81,6 +81,18 @@ ParDraws <- extract(fit)
  plot(density(lambda_UKRN),col="blue")
  lines(density(lambda_NonUKRN),col="red")
  mean(lambda_UKRN > lambda_NonUKRN)
-
+ 
+ #To see the magnitude of this difference. 
+ #ParDraws <- extract(fit)
+ 
+ #lambda_UKRN <- exp(ParDraws$mu + ParDraws$beta*1)
+ #lambda_NonUKRN <- exp(ParDraws$mu)
+ #plot(density(lambda_UKRN),col="blue")
+ #lines(density(lambda_NonUKRN),col="red")
+ #mean(lambda_UKRN > lambda_NonUKRN)
+ 
 
 # Truncated linear regression
+ 
+ 
+ 
