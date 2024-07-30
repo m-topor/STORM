@@ -1,11 +1,12 @@
 Meta-Data
 
-This folder has raw data and scripts. In a separate folder called "cleaned_data", the output from the s1_Preprocessing script is placed. 
+In this folder called "cleaned_data", the outputs from the s1_Preprocessing script are placed. 
 The raw data will not be explained in this meta-data document. The s1_Preprocessing script efficiently deals with organising the data to make them ready for planned analyses. 
 
 Raw data: "STORM_Project_anonymised.csv" &  "crisis_explain_wave_1.csv"
 
 Final Processed data: "final_wave1.csv"
+Note: The final_wave1_extended.csv has more extended data with additional columns extracted from the raw file, which were deemed unnecessary for the current analyses.
 
 
 -----------------final_wave1.csv--------------------------

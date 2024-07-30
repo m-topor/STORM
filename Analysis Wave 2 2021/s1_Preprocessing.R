@@ -1,7 +1,7 @@
 # STORM DATA SCRIPT
 # 20/12/2020, PS (PRE-PROCESSING BY MT) and edited Oct 2022 KGL
 
-# ANONYMISED and edited BY MT 22/04/2024
+# ANONYMISED and edited BY MT 25/07/2024
 
 # LOAD LIBRARIES AND DATA ----
 
@@ -16,29 +16,37 @@ library(ggplot2)
 library(ltm)
 
 #Read in the file
-df_all_data <- read.csv('STORM_Project_2020_anonymised.csv')
+df_all_data <- read.csv('STORM_Project_2021_anonymised.csv')
 
 
 # DATA CLEANING ----
 
-#Remove columns that are not needed (start date, end date, status, recorded date, response id, distribution channel, language)
-#No individuals responded "no" to the questions on have you read the information sheet and whether they agree to take part so these two columns will be removed too
-#The column with answers for the 'other' box for "attended uni" was empty so also removed
-#Tables below show these frequencies
-table(df_all_data$Q1)
-table(df_all_data$Q5)
-table(df_all_data$Q26)
+#Remove columns that are not needed (start date, end date, status, IP address, recorded date, response id, recipient first name, recipient last name, recipient email, external reference, latitude, longitude distribution channel, language, email, other uni)
+#The column with answers for the 'other' box for "attended uni" had 3 universities mentioned, these were marked with the right uni code and the column was assigned NAs and was also removed
+#Q14 and Q16 are asking the same thing - answers from Q16 were moved to Q14 and the column is deleted
 
-#Remove these columns
-df_all_data <- df_all_data[,-c(1:3, 7:12, 14)]
+for (i in 1:length(df_all_data$X)){
+  if (df_all_data$Q14[i] == ''){
+    df_all_data$Q14[i] <- df_all_data$Q16[i] 
+  }
+}
+# A similar situation with questions Q13 and Q15
+for (i in 1:length(df_all_data$X)){
+  if (df_all_data$Q13[i] == ''){
+    df_all_data$Q13[i] <- df_all_data$Q15[i] 
+  }
+}
+
+#Remove the columns
+df_all_data <- df_all_data[,-c(1:5, 9:18, 20, 23, 29:30)]
 
 #Remove rows that are not needed (first two rows that are not participants)
 df_all_data <- df_all_data[-c(1:2),]
 
 #Rename all the columns to make it easier to reference them
-colnames(df_all_data) <- c('Progress', 'Duration_Seconds', 'Finished', 'Uni',	'Full_Part',	'PTY',	
-                           'PTY_Other',	'Course_Duration',	'Current_Year',	'Course_Duration_Other',	
-                           'Current_Year_Other',	'Course_Name',	'Previous_Training',	'Gender',	
+colnames(df_all_data) <- c('Progress', 'Duration_Seconds', 'Finished', 'Participant_ID', 'Age', 'Uni',	'Full_Part',	'PTY',	
+                           'PTY_Other',	'Course_Duration',	'Current_Year',		
+                           'Course_Name',	'Gender',	
                            'Perception_1',	'Perception_2',	'Perception_3',	'Perception_4',	'Perception_5',	
                            'Perception_6',	'Perception_7',	'Perception_8',	'Perception_9',	'Perception_10',	
                            'Perception_11',	'Perception_12',	'Perception_13',	'Perception_14',	
@@ -61,11 +69,11 @@ df_all_data$Duration_Seconds <- as.numeric(df_all_data$Duration_Seconds)
 
 # average RT in minutes before exclusions
 mean(df_all_data$Duration_Seconds)/60
-# 29.21 minutes
+# 77.10 minutes
 
 #then filter those who spent under 4 minutes
 df_incl_cri_met <- filter(df_all_data, Duration_Seconds > 240)
-#204 cases were removed, 982 total
+#108 cases were removed, 810 total
 
 #------------2. Select individuals from Unis with more than 10 entries
 # First, check the frequency for each university
@@ -91,12 +99,7 @@ df_incl_cri_met <- df_incl_cri_met %>%
 #Also remove those that did not state their University or where university  - in the "Uni" column, this is marked with an empty cell
 df_incl_cri_met <- df_incl_cri_met %>%
   filter(Uni != "")
-#remaining 905
-
-
-#delete the first case as it's Katie trying it out
-df_incl_cri_met <- df_incl_cri_met[-1,]
-# remaining 904 
+#remaining 760
 
 
 #-----------3. Missing Data
@@ -117,16 +120,23 @@ table(df_incl_cri_met$Gender)
 
 #Filter out the odd answers
 df_incl_cri_met <- df_incl_cri_met %>% 
-  filter(!str_detect(Gender, "20|29"))
-#2 cases were removed, total 902
+  filter(!str_detect(Gender, "18|AFAB|x"))
+#2 cases were removed, total 757
 
 
-#I also checked the last question for duplicates - there were none, and screened
-# for any odd answers and there was one which I filtered out
+#I also checked the last comment question for duplicates - there were none, and screened
+# for any odd answers and there was none
+duplicates <- table(df_incl_cri_met$comments) > 2
+which(duplicates == TRUE)
+
+#There seem to be some duplicates in the ID so these will also be removed
+which(table(df_incl_cri_met$Participant_ID) > 1)
+length(which(table(df_incl_cri_met$Participant_ID) > 1))
+
 df_incl_cri_met <- df_incl_cri_met %>% 
-  filter(!str_detect(understanding_crisis, "DO NOT USE MY DATA"))
-#1 cases were removed, total 901
+  distinct(Participant_ID, .keep_all = TRUE)
 
+#15 removed 742 remain
 
 #-----------4. Keep only undergraduate students
 # I displayed the df_incl_cri_met window and used the filter option at the top 
@@ -135,19 +145,35 @@ df_incl_cri_met <- df_incl_cri_met %>%
 
 #Filter out individuals who are doing an MSc student
 df_incl_cri_met <- df_incl_cri_met %>% 
-  filter(!str_detect(Course_Name, "Msc|MSc|masters|Masters|MA Clinical Psychology"))
-#11 cases removed, 889 total
+  filter(!str_detect(Course_Name, "MSc|MSci|Doctorate of Clinical Psychology"))
+#6 cases removed, 736 total
+
+#There are also students who are not from psychology so they should be removed
+table(df_incl_cri_met$Course_Name)
+
+exclude_course <- c("BA (HONS) SOCIOLOGY (WITH FOUNDATION YEAR) SW", "BA HONS CRIMINOLOGY", "criminology", "Criminology", "criminology with foundation year ", "LLB Law and Criminology ", "Natural Sciences", "TEST")
+
+df_incl_cri_met$exclude <- NA
+for (i in 1: length(df_incl_cri_met$Progress)){
+  check <- df_incl_cri_met$Course_Name[i] == exclude_course
+  df_incl_cri_met$exclude[i] <- sum(check == TRUE) 
+}
+
+df_incl_cri_met <- df_incl_cri_met %>% 
+  filter(exclude == 0)
+#10 cases removed, 726 total
+
 
 #Now let's check if there are still 10 cases per each included uni
 
 table(df_incl_cri_met$Uni)
-#Yes, all good, 25 Unis left
+#Yes, all good, 19 Unis left
 
 
 # Check response time once more
 # median RT in minutes
 median(df_incl_cri_met$Duration_Seconds)/60
-# 8.05 minutes
+# 16.27 minutes
 
 
 
@@ -163,10 +189,10 @@ df_incl_cri_met$UKRN[df_incl_cri_met$UKRN == "Other"] <- NA
 
 #summarise this in a table
 table(df_incl_cri_met$UKRN)
-# Non-UKRN = 441; UKRN = 437
+# Non-UKRN = 502; UKRN = 224
 
 #------------Timepoint variable ----- 
-df_incl_cri_met$timepoint=1
+df_incl_cri_met$timepoint=2
 
 
 #----------Coded variable for crisis explanation ------------------
@@ -176,18 +202,30 @@ df_incl_cri_met$ID <- 1:nrow(df_incl_cri_met)
 
 # i.e., Merge two datasets 
 #Read in crisis_explain data file 
-crisis_explain_wave1 <- read.csv('crisis_explain_wave_1.csv')
-colnames(crisis_explain_wave1) <- c('ID',	'crisis_explain')
+crisis_explain_wave2 <- read.csv('crisis_explain_wave2.csv')
+crisis_explain_wave2 <- crisis_explain_wave2[,c(1,7)]
 
-clean_data <- merge(df_incl_cri_met, crisis_explain_wave1, by="ID")
+colnames(crisis_explain_wave2) <- c('Participant_ID',	'crisis_explain')
 
+#also remove duplicates
+crisis_explain_wave2 <- crisis_explain_wave2 %>% 
+  distinct(Participant_ID, .keep_all = TRUE)
+
+#in order to not introduce empty rows for previosuly removed participants, we will only import data only for those participants who are currently in the data frame
+keep_ptts <- intersect(df_incl_cri_met$Participant_ID, crisis_explain_wave2$Participant_ID)
+
+crisis_explain_wave2 <- crisis_explain_wave2 %>% 
+  filter(Participant_ID %in% c(keep_ptts))
+
+#Merge
+clean_data <- merge(df_incl_cri_met, crisis_explain_wave2, by = "Participant_ID", all = TRUE)
 
 
 # -------EXCLUSION - YEAR GROUP ----
 
 # Make a file with only full time students for now. This file should be used for any academic year group analysis 
 Wave1_FT=subset(clean_data, Full_Part %in% c("Full-time"))
-# removed 36, total = 853
+# removed 29, total = 697
 
 # New coding for the current year of study
 Wave1_FT$Current_Year[Wave1_FT$Current_Year == "1st Year"] <- "Year 1"
@@ -210,15 +248,12 @@ final_df <- Wave1_FT %>%
 # Check how many per University
 table(final_df$Uni)
 
-#remove UNIs with fewer than 10 responses and uni marked as "other"
 
-final_df <- final_df[final_df$Uni != "Other" & final_df$Uni != "UNI27",]
-
-#Final sample 842
+#Final sample 696
 
 table(final_df$UKRN)
 
-#407 non-UKRN and 435 in UKRN
+#474 non-UKRN and 222 in UKRN
 
 # ------- VARIABLE PREP ----
 
@@ -279,9 +314,9 @@ final_df <- recode2(final_df, fields = c('crisis_aware', 'crisis_learnt', 'os_ex
 
 #Lastly, make sure that all of the new number variables are numerical 
 # for future calculations.
-final_df[,16:57] <- sapply(final_df[,16:57],as.numeric)
+final_df[,14:55] <- sapply(final_df[,14:55],as.numeric)
 #There is a categorical variable in the middle so the code had to be split
-final_df[,59:61] <- sapply(final_df[,59:61],as.numeric)
+final_df[,57:59] <- sapply(final_df[,57:59],as.numeric)
 #Check if it worked
 str(final_df)
 
@@ -292,9 +327,9 @@ str(final_df)
 #This is contextual perception
 #Here this shows precisely how many elements the students have judged positively
 final_df <- final_df %>% 
-  rowwise() %>% 
+  rowwise() %>%
   mutate(Perception_Score_Total = sum(Perception_1, Perception_2, Perception_3, Perception_4, Perception_5, 
-           Perception_6, Perception_7, Perception_8, Perception_9, Perception_10, Perception_11, 
+           Perception_6, Perception_7, Perception_8, Perception_9, Perception_10, Perception_11,  
            Perception_12, Perception_13, Perception_14, Perception_15, Perception_16)) 
 
 # -- Create a new variable - Perception_Score_Mean - as a mean of all answers to the perception questions
@@ -314,21 +349,20 @@ final_df <- final_df %>%
 final_df <- final_df %>% 
   rowwise() %>%
   mutate(Knowledge_Score_Total = sum(Knowledge_1, Knowledge_2, Knowledge_3, Knowledge_4, Knowledge_5, 
-           Knowledge_6, Knowledge_7, Knowledge_8)) 
+           Knowledge_6,Knowledge_7,Knowledge_8)) 
 
 # -- Knowledge_Score_Mean - as a mean of all answers to the perception questions
 # Mean situational perception of open science practices
 final_df <- final_df %>% 
   rowwise() %>% 
   mutate(Knowledge_Score_Mean=mean(c(Knowledge_1, Knowledge_2, Knowledge_3, Knowledge_4, Knowledge_5, 
-                                       Knowledge_6, Knowledge_7, Knowledge_8), na.rm=T)) 
+                                       Knowledge_6, Knowledge_7, Knowledge_8))) 
 
 
 #----- Awareness of open research Q181_1-Q181_8 - Total Scores
 # -- Create a new variable - Awareness_Score_Total
 #Here this shows precisely how many elements the students are aware of
 final_df <- final_df %>% 
-  rowwise() %>% 
   mutate(Awareness_Score_Total = sum(Awareness_1, Awareness_2, Awareness_3, Awareness_4, Awareness_5, 
            Awareness_6, Awareness_7, Awareness_8))  
 
@@ -336,15 +370,13 @@ final_df <- final_df %>%
 # -- Create a new variable - Experience_Score_Total
 #Here this shows precisely how many elements the students have experience of
 final_df <- final_df %>% 
-  rowwise() %>%
   mutate(Experience_Score_Total = sum(Experience_1, Experience_2, Experience_3, Experience_4, Experience_5, 
            Experience_6, Experience_7, Experience_8))  
 
 
-
 #---------FINAL EXCLUSIONS--------------
 #Check how many people have actually completed enough of the questionnaire to use for the analyses
-#Then devide the dataset into different outcome variables of interest
+#Then dIvide the dataset into different outcome variables of interest
 
 
 # make new columns which will mark inclusion in new datasets
@@ -382,18 +414,17 @@ final_df$crisis_explain_Completed[final_df$crisis_explain == 9999] <- 0
 final_df_all <- final_df #save all of the columns just in case needed later
 
 final_df <- final_df %>% 
-  dplyr::select("ID", "Progress", "Uni", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Perception_1", "Perception_2", "Perception_3", "Perception_4",  "Perception_5", 
+  dplyr::select("ID", "Progress", "Uni", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Gender", "Age", "UKRN", "timepoint", "Perception_1", "Perception_2", "Perception_3", "Perception_4",  "Perception_5", 
                 "Perception_6", "Perception_7", "Perception_8", "Perception_9", "Perception_10", "Perception_11", "Perception_12", "Perception_13", "Perception_14",  "Perception_15", "Perception_16", "Knowledge_1", "Knowledge_2", "Knowledge_3", 
                 "Knowledge_4", "Knowledge_5", "Knowledge_6", "Knowledge_7", "Knowledge_8", "Awareness_1", "Awareness_2", "Awareness_3", "Awareness_4", "Awareness_5", "Awareness_6", "Awareness_7", "Awareness_8", "Experience_1", "Experience_2", 
                 "Experience_3", "Experience_4", "Experience_5", "Experience_6", "Experience_7", "Experience_8", "Perception_Score_Total", "Perception_Score_Mean", "Knowledge_Score_Total", "Knowledge_Score_Mean",  "Awareness_Score_Total", "Experience_Score_Total", 
                 "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "applicability", "comments")
 
-colnames(final_df) <- c("ID", "Progress", "Uni", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Perception_Replication1", "Perception_Replication2", "Perception_Materials1", "Perception_Materials2",  "Perception_Education1", 
+colnames(final_df) <- c("ID", "Progress", "Uni", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Gender", "Age", "UKRN", "timepoint", "Perception_Replication1", "Perception_Replication2", "Perception_Materials1", "Perception_Materials2",  "Perception_Education1", 
                         "Perception_Education2", "Perception_Access1", "Perception_Access2", "Perception_Data1", "Perception_Data2", "Perception_Power1", "Perception_Power2", "Perception_Preregistration1", "Perception_Preregistration2",  "Perception_Preprint1", "Perception_Preprint2", "Knowledge_Replication", 
                         "Knowledge_Materials", "Knowledge_Education", "Knowledge_Access", "Knowledge_Data", "Knowledge_Power", "Knowledge_Preregistration", "Knowledge_Preprint", "Awareness_Replication", "Awareness_Materials", "Awareness_Education", "Awareness_Access", "Awareness_Data", "Awareness_Power", "Awareness_Preregistration", 
                         "Awareness_Preprint", "Experience_Replication", "Experience_Materials", "Experience_Education", "Experience_Access", "Experience_Data", "Experience_Power", "Experience_Preregistration", "Experience_Preprint", "Perception_Score_Total", "Perception_Score_Mean", "Knowledge_Score_Total", "Knowledge_Score_Mean",  "Awareness_Score_Total", "Experience_Score_Total", 
                         "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "applicability", "comments")
-final_df$crisis_explain[final_df$crisis_explain == 9999] <- NA
 
 
 #--------------MAKE SEPARATE DFs FOR OUTCOMES --------------------
@@ -407,8 +438,7 @@ final_df$crisis_explain[final_df$crisis_explain == 9999] <- NA
 
 #This one has a lot of missing data but I did not remove any because these are single questions not forming any sub-scales
 Set1_AllData <- final_df_all %>%
-  dplyr::select("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "applicability", "crisis_aware_Completed", "crisis_learnt_Completed", "crisis_explain_Completed", "os_explain_Completed", "os_learnt_Completed", "applicability_Completed")
-Set1_AllData$crisis_explain[Set1_AllData$crisis_explain == 9999] <- NA
+  dplyr::select("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Gender", "Age", "UKRN", "timepoint", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "applicability", "crisis_aware_Completed", "crisis_learnt_Completed", "crisis_explain_Completed", "os_explain_Completed", "os_learnt_Completed", "applicability_Completed")
 
 # Set 2 of Analyses
 
@@ -424,56 +454,52 @@ Set1_AllData$crisis_explain[Set1_AllData$crisis_explain == 9999] <- NA
 # Comparing responses to Replication, Materials, Education, Access, Data, Power, Preregistration, Preprint
 
 Set2_ConceptualPerception <- final_df_all %>%
-  dplyr::select("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Perception_1", "Perception_2", "Perception_3", "Perception_4",  "Perception_5", 
+  dplyr::select("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Gender", "Age", "UKRN", "timepoint", "Perception_1", "Perception_2", "Perception_3", "Perception_4",  "Perception_5", 
            "Perception_6", "Perception_7", "Perception_8", "Perception_9", "Perception_10", "Perception_11", "Perception_12", "Perception_13", "Perception_14",  "Perception_15", "Perception_16", "Perception_Score_Total", "Perception_Score_Mean", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Perception_Completed")
 Set2_ConceptualPerception <- Set2_ConceptualPerception[Set2_ConceptualPerception$Perception_Completed == 1, ]
-colnames(Set2_ConceptualPerception) <- c("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Perception_Replication1", "Perception_Replication2", "Perception_Materials1", "Perception_Materials2",  "Perception_Education1", 
+colnames(Set2_ConceptualPerception) <- c("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Gender", "Age", "UKRN", "timepoint", "Perception_Replication1", "Perception_Replication2", "Perception_Materials1", "Perception_Materials2",  "Perception_Education1", 
 "Perception_Education2", "Perception_Access1", "Perception_Access2", "Perception_Data1", "Perception_Data2", "Perception_Power1", "Perception_Power2", "Perception_Preregistration1", "Perception_Preregistration2",  "Perception_Preprint1", "Perception_Preprint2", "Perception_Score_Total", "Perception_Score_Mean", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Perception_Completed")
-Set2_ConceptualPerception$crisis_explain[Set2_ConceptualPerception$crisis_explain == 9999] <- NA 
 
 Set2_SituationalPerception <- final_df_all %>% 
-  dplyr::select("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Knowledge_1", "Knowledge_2", "Knowledge_3", "Knowledge_4", "Knowledge_5", "Knowledge_6", "Knowledge_7", "Knowledge_8", "Knowledge_Score_Total", "Knowledge_Score_Mean", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Knowledge_Completed")
+  dplyr::select("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Gender", "Age", "UKRN", "timepoint", "Knowledge_1", "Knowledge_2", "Knowledge_3", "Knowledge_4", "Knowledge_5", "Knowledge_6", "Knowledge_7", "Knowledge_8", "Knowledge_Score_Total", "Knowledge_Score_Mean", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Knowledge_Completed")
 Set2_SituationalPerception <- Set2_SituationalPerception[Set2_SituationalPerception$Knowledge_Completed == 1,]
-colnames(Set2_SituationalPerception) <- c("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Knowledge_Replication", "Knowledge_Materials", "Knowledge_Education", "Knowledge_Access", "Knowledge_Data", "Knowledge_Power", "Knowledge_Preregistration", "Knowledge_Preprint", "Knowledge_Score_Total", "Knowledge_Score_Mean", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Knowledge_Completed") 
-Set2_SituationalPerception$crisis_explain[Set2_SituationalPerception$crisis_explain == 9999] <- NA
+colnames(Set2_SituationalPerception) <- c("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Gender", "Age", "UKRN", "timepoint", "Knowledge_Replication", "Knowledge_Materials", "Knowledge_Education", "Knowledge_Access", "Knowledge_Data", "Knowledge_Power", "Knowledge_Preregistration", "Knowledge_Preprint", "Knowledge_Score_Total", "Knowledge_Score_Mean", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Knowledge_Completed") 
 
 Set2_Awareness <- final_df_all %>% 
-  dplyr::select("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Awareness_1", "Awareness_2", "Awareness_3", "Awareness_4", "Awareness_5", "Awareness_6", "Awareness_7", "Awareness_8", "Awareness_Score_Total", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Awareness_Completed")
+  dplyr::select("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Gender", "Age", "UKRN", "timepoint", "Awareness_1", "Awareness_2", "Awareness_3", "Awareness_4", "Awareness_5", "Awareness_6", "Awareness_7", "Awareness_8", "Awareness_Score_Total", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Awareness_Completed")
 Set2_Awareness <- Set2_Awareness[Set2_Awareness$Awareness_Completed == 1,]
-colnames(Set2_Awareness) <- c("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Awareness_Replication", "Awareness_Materials", "Awareness_Education", "Awareness_Access", "Awareness_Data", "Awareness_Power", "Awareness_Preregistration", "Awareness_Preprint", "Awareness_Score_Total", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Awareness_Completed")
-Set2_Awareness$crisis_explain[Set2_Awareness$crisis_explain == 9999] <- NA
-  
+colnames(Set2_Awareness) <- c("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Gender", "Age", "UKRN", "timepoint", "Awareness_Replication", "Awareness_Materials", "Awareness_Education", "Awareness_Access", "Awareness_Data", "Awareness_Power", "Awareness_Preregistration", "Awareness_Preprint", "Awareness_Score_Total", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Awareness_Completed")
+
 Set2_Experience <- final_df_all %>% 
-  dplyr::select("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Experience_1", "Experience_2", "Experience_3", "Experience_4", "Experience_5", "Experience_6", "Experience_7", "Experience_8", "Experience_Score_Total", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Experience_Completed") 
+  dplyr::select("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Gender", "Age", "UKRN", "timepoint", "Experience_1", "Experience_2", "Experience_3", "Experience_4", "Experience_5", "Experience_6", "Experience_7", "Experience_8", "Experience_Score_Total", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Experience_Completed") 
 Set2_Experience <- Set2_Experience[Set2_Experience$Experience_Completed == 1,]
-colnames(Set2_Experience) <- c("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Previous_Training", "Gender", "UKRN", "timepoint", "Experience_Replication", "Experience_Materials", "Experience_Education", "Experience_Access", "Experience_Data", "Experience_Power", "Experience_Preregistration", "Experience_Preprint", "Experience_Score_Total", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Experience_Completed") 
-Set2_Experience$crisis_explain[Set2_Experience$crisis_explain == 9999] <- NA
+colnames(Set2_Experience) <- c("ID", "Uni", "Full_Part", "PTY", "Current_Year", "Course_Duration", "Course_Name", "Gender", "Age", "UKRN", "timepoint", "Experience_Replication", "Experience_Materials", "Experience_Education", "Experience_Access", "Experience_Data", "Experience_Power", "Experience_Preregistration", "Experience_Preprint", "Experience_Score_Total", "crisis_aware", "crisis_learnt", "crisis_explain", "os_explain", "os_learnt", "Experience_Completed") 
 
 
 
-setwd("C:/Users/marto05/OneDrive - Linköpings universitet/10. Side projects/2. STORM/STORM/Analysis Wave 1 2020/cleaned_data")
-write.csv(Set1_AllData, "W1_Set1_AllData.csv", row.names = FALSE)
-write.csv(Set2_ConceptualPerception, "W1_Set2_ConceptualPerception.csv", row.names = FALSE)
-write.csv(Set2_SituationalPerception, "W1_Set2_SituationalPerception.csv", row.names = FALSE)
-write.csv(Set2_Awareness, "W1_Set2_Awareness.csv", row.names = FALSE)
-write.csv(Set2_Experience, "W1_Set2_Experience.csv", row.names = FALSE)
+setwd("C:/Users/marto05/OneDrive - Linköpings universitet/10. Side projects/2. STORM/STORM/Analysis Wave 2 2021/cleaned_data")
+write.csv(Set1_AllData, "W2_Set1_AllData.csv", row.names = FALSE)
+write.csv(Set2_ConceptualPerception, "W2_Set2_ConceptualPerception.csv", row.names = FALSE)
+write.csv(Set2_SituationalPerception, "W2_Set2_SituationalPerception.csv", row.names = FALSE)
+write.csv(Set2_Awareness, "W2_Set2_Awareness.csv", row.names = FALSE)
+write.csv(Set2_Experience, "W2_Set2_Experience.csv", row.names = FALSE)
 
-write.csv(final_df, "W1_final_wave1.csv", row.names = FALSE)
-write.csv(final_df_all, "W1_final_wave1_extended.csv", row.names = FALSE)
+write.csv(final_df, "W2_final_wave2.csv", row.names = FALSE)
+write.csv(final_df_all, "W2_final_wave2_extended.csv", row.names = FALSE)
 
-
-setwd("C:/Users/marto05/OneDrive - Linköpings universitet/10. Side projects/2. STORM/STORM/Analysis Wave 1 2020")
+setwd("C:/Users/marto05/OneDrive - Linköpings universitet/10. Side projects/2. STORM/STORM/Analysis Wave 2 2021")
 
 
 #------------------------Cronbach's Alpha------------------------
+#NOTE DONE
 #Set1_ConceptualPerception
-cronbach.alpha(Set2_ConceptualPerception[,12:28], na.rm=TRUE)
+#cronbach.alpha(Set2_ConceptualPerception[,12:28], na.rm=TRUE)
 #Set1_SituationalPerception 
-cronbach.alpha(Set2_SituationalPerception[,12:19], na.rm=TRUE)
+#cronbach.alpha(Set2_SituationalPerception[,12:19], na.rm=TRUE)
 #Set1_Awareness
-cronbach.alpha(Set2_Awareness[,12:19], na.rm=TRUE)
+#cronbach.alpha(Set2_Awareness[,12:19], na.rm=TRUE)
 #Set1_Experience
-cronbach.alpha(Set2_Experience[,12:19], na.rm=TRUE)
+#cronbach.alpha(Set2_Experience[,12:19], na.rm=TRUE)
 
 
 

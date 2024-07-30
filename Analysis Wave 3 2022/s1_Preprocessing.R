@@ -1,7 +1,7 @@
 # STORM DATA SCRIPT
 # 20/12/2020, PS (PRE-PROCESSING BY MT) and edited Oct 2022 KGL
 
-# ANONYMISED and edited BY MT 22/04/2024
+# ANONYMISED and edited BY MT 26/07/2024
 
 # LOAD LIBRARIES AND DATA ----
 
@@ -16,7 +16,7 @@ library(ggplot2)
 library(ltm)
 
 #Read in the file
-df_all_data <- read.csv('STORM_Project_2020_anonymised.csv')
+df_all_data <- read.csv('STORM_Project_2022_anonymised.csv')
 
 
 # DATA CLEANING ----
@@ -30,15 +30,15 @@ table(df_all_data$Q5)
 table(df_all_data$Q26)
 
 #Remove these columns
-df_all_data <- df_all_data[,-c(1:3, 7:12, 14)]
+df_all_data <- df_all_data[,-c(1:4, 8:13, 15)]
 
 #Remove rows that are not needed (first two rows that are not participants)
 df_all_data <- df_all_data[-c(1:2),]
 
 #Rename all the columns to make it easier to reference them
 colnames(df_all_data) <- c('Progress', 'Duration_Seconds', 'Finished', 'Uni',	'Full_Part',	'PTY',	
-                           'PTY_Other',	'Course_Duration',	'Current_Year',	'Course_Duration_Other',	
-                           'Current_Year_Other',	'Course_Name',	'Previous_Training',	'Gender',	
+                           'PTY_Other',	'Course_Duration',	'Current_Year', 'Course_Duration_Other', 
+                           'Current_Year_Other', 'Course_Name',	'Previous_Training',	'Gender',	
                            'Perception_1',	'Perception_2',	'Perception_3',	'Perception_4',	'Perception_5',	
                            'Perception_6',	'Perception_7',	'Perception_8',	'Perception_9',	'Perception_10',	
                            'Perception_11',	'Perception_12',	'Perception_13',	'Perception_14',	
@@ -61,11 +61,11 @@ df_all_data$Duration_Seconds <- as.numeric(df_all_data$Duration_Seconds)
 
 # average RT in minutes before exclusions
 mean(df_all_data$Duration_Seconds)/60
-# 29.21 minutes
+# 155.17 minutes
 
 #then filter those who spent under 4 minutes
 df_incl_cri_met <- filter(df_all_data, Duration_Seconds > 240)
-#204 cases were removed, 982 total
+#69 cases were removed, 714 total
 
 #------------2. Select individuals from Unis with more than 10 entries
 # First, check the frequency for each university
@@ -88,15 +88,7 @@ for (i in 1:length(df_incl_cri_met$Uni)){
 df_incl_cri_met <- df_incl_cri_met %>%
   filter(include == 1)
 
-#Also remove those that did not state their University or where university  - in the "Uni" column, this is marked with an empty cell
-df_incl_cri_met <- df_incl_cri_met %>%
-  filter(Uni != "")
-#remaining 905
-
-
-#delete the first case as it's Katie trying it out
-df_incl_cri_met <- df_incl_cri_met[-1,]
-# remaining 904 
+#remaining 572
 
 
 #-----------3. Missing Data
@@ -114,40 +106,27 @@ table(df_incl_cri_met$Progress)
 
 #Frequencies of the answers to the gender question
 table(df_incl_cri_met$Gender)
-
-#Filter out the odd answers
-df_incl_cri_met <- df_incl_cri_met %>% 
-  filter(!str_detect(Gender, "20|29"))
-#2 cases were removed, total 902
+#nothing unusual
 
 
 #I also checked the last question for duplicates - there were none, and screened
 # for any odd answers and there was one which I filtered out
 df_incl_cri_met <- df_incl_cri_met %>% 
-  filter(!str_detect(understanding_crisis, "DO NOT USE MY DATA"))
-#1 cases were removed, total 901
+  filter(!str_detect(comments, "dfghfgh"))
 
+#1 cases were removed, total 571
 
-#-----------4. Keep only undergraduate students
-# I displayed the df_incl_cri_met window and used the filter option at the top 
-# to look for characters msc and ma in the Course_Name column to find the strings
-# that I put into the code to filter these out
-
-#Filter out individuals who are doing an MSc student
-df_incl_cri_met <- df_incl_cri_met %>% 
-  filter(!str_detect(Course_Name, "Msc|MSc|masters|Masters|MA Clinical Psychology"))
-#11 cases removed, 889 total
 
 #Now let's check if there are still 10 cases per each included uni
 
 table(df_incl_cri_met$Uni)
-#Yes, all good, 25 Unis left
+#Yes, all good, 9 Unis left
 
 
 # Check response time once more
 # median RT in minutes
 median(df_incl_cri_met$Duration_Seconds)/60
-# 8.05 minutes
+# 31.18 minutes
 
 
 
@@ -163,10 +142,10 @@ df_incl_cri_met$UKRN[df_incl_cri_met$UKRN == "Other"] <- NA
 
 #summarise this in a table
 table(df_incl_cri_met$UKRN)
-# Non-UKRN = 441; UKRN = 437
+# Non-UKRN = 84; UKRN = 487
 
 #------------Timepoint variable ----- 
-df_incl_cri_met$timepoint=1
+df_incl_cri_met$timepoint=3
 
 
 #----------Coded variable for crisis explanation ------------------
@@ -176,7 +155,7 @@ df_incl_cri_met$ID <- 1:nrow(df_incl_cri_met)
 
 # i.e., Merge two datasets 
 #Read in crisis_explain data file 
-crisis_explain_wave1 <- read.csv('crisis_explain_wave_1.csv')
+crisis_explain_wave1 <- read.csv('crisis_explain_wave_3.csv')
 colnames(crisis_explain_wave1) <- c('ID',	'crisis_explain')
 
 clean_data <- merge(df_incl_cri_met, crisis_explain_wave1, by="ID")
@@ -239,42 +218,42 @@ recode2 <- function ( data, fields, recodes) {
 final_df <- recode2(final_df, fields = c('Perception_1', 'Perception_3', 'Perception_5', 
                                                        'Perception_7', 'Perception_9', 'Perception_11', 
                                                        'Perception_13', 'Perception_15'), 
-                           recodes = "'Strongly disagree' = -2; 'Disagree' = -1; 'Have no opinion' = 0; 
-                           'Agree' = 1; 'Strongly agree' = 2")
+                           recodes = "'1' = -2; '2' = -1; '3' = 0; 
+                           '4' = 1; '5' = 2")
 #Perception of Open Research - reverse coded items
 final_df <- recode2(final_df, fields = c('Perception_2', 'Perception_4', 'Perception_6', 
                                                        'Perception_8', 'Perception_10', 'Perception_12', 
                                                        'Perception_14', 'Perception_16'), 
-                           recodes = "'Strongly disagree' = 2; 'Disagree' = 1; 'Have no opinion' = 0; 
-                           'Agree' = -1; 'Strongly agree' = -2")
+                           recodes = "'1' = 2; '2' = 1; '3' = 0; 
+                           '4' = -1; '5' = -2")
 
 # Awareness of Open Research
 final_df <- recode2(final_df, fields = c('Awareness_1', 'Awareness_2', 'Awareness_3', 
                                                        'Awareness_4', 'Awareness_5', 'Awareness_6', 
                                                        'Awareness_7', 'Awareness_8'), 
-                           recodes = "'I have heard of this' = 1; '' = 0")
+                           recodes = "'1' = 1; '0' = 0")
 
 #Experience of Open Research
 final_df <- recode2(final_df, fields = c('Experience_1', 'Experience_2', 'Experience_3', 
                                                        'Experience_4', 'Experience_5', 'Experience_6', 
                                                        'Experience_7', 'Experience_8'), 
-                           recodes = "'I have done/used this' = 1; '' = 0")
+                           recodes = "'1' = 1; '0' = 0")
 
 #Knowledge of Open Research - standard scoring
 final_df <- recode2(final_df, fields = c('Knowledge_1', 'Knowledge_3', 'Knowledge_6', 
                                                        'Knowledge_8'), 
-                           recodes = "'Strongly disagree' = -2; 'Strongly Disagree' = -2; 'Disagree' = -1; 
-                           'Have no opinion' = 0; 'Agree' = 1; 'Strongly Agree' = 2; 'Strongly agree' = 2")
+                           recodes = "'1' = -2; '2' = -1; 
+                           '3' = 0; '4' = 1; '5' = 2;")
 #Knowledge of Open Research - reverse coded items
 final_df <- recode2(final_df, fields = c('Knowledge_2', 'Knowledge_4', 'Knowledge_5', 
                                                        'Knowledge_7'), 
-                           recodes = "'Strongly disagree' = 2; 'Strongly Disagree' = 2; 'Disagree' = 1; 
-                           'Have no opinion' = 0; 'Agree' = -1; 'Strongly Agree' = -2; 'Strongly agree' = -2")
+                           recodes = "'1' = 2; '2' = 1; 
+                           '3' = 0; '4' = -1; '5' = -2;")
 
-#Secondary DVs with yes/no/notsure answers
+#Secondary DVs with yes (1)/no(2)/notsure(3) answers
 final_df <- recode2(final_df, fields = c('crisis_aware', 'crisis_learnt', 'os_explain', 
                                                        'os_learnt', 'applicability'), 
-                           recodes = "'Yes' = 1; 'No' = 0; 'Not sure' = 0")
+                           recodes = "'1' = 1; '2' = 0; '3' = 0; '' = 0")
 
 
 #Lastly, make sure that all of the new number variables are numerical 
