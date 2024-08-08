@@ -34,7 +34,7 @@ Below is a list of differences between waves 1, 2 and 3
 1. During Wave 2, participants also answered some additional questionnaires that were part of separate analyses - link to the paper:  
 As a result, the structure of the file is slightly different. Age was collected from participants at Wave 2 but not at Wave 1.   
   
-2. The raw data file downloaded for Wave 3 has empty columns and some columns are already transformed into numbers. For instance, the Gender column is categorised as 1 = male, 2 = female, 3 = non-binary and 4 = other. All variables of interest already have numerical values and they are recoded in the preprocessing script to ensure that they are consistent with the other two waves. 
+2. The raw data file downloaded for Wave 3 has some empty columns and some columns are already transformed into numbers. The Gender column is categorised as 1 = male, 2 = female, 3 = non-binary and 4 = other. All variables of interest already have numerical values and they are recoded in the preprocessing script to ensure that they are consistent with the other two waves. The columns full time/part time study, PTY for professional training year, Course_Duration and Previous_Training are epmty as the data were not collected. In waves 1 and 2 we filtered out participants who were not full time students. For this wave, this is not possible.
   
 
   

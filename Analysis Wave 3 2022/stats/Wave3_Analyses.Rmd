@@ -1,8 +1,8 @@
 ---
-title: "Wave 1 Statistical Analyses"
+title: "Wave 3 Statistical Analyses"
 output: pdf_document
 author: Marta Topor & Bertil Wegmann
-date: June 2024
+date: August 2024
 ---
 
 ```{r setup, include=FALSE, echo = FALSE}

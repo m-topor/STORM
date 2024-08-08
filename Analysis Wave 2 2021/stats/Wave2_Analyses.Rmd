@@ -1,8 +1,8 @@
 ---
-title: "Wave 1 Statistical Analyses"
+title: "Wave 2 Statistical Analyses"
 output: pdf_document
 author: Marta Topor & Bertil Wegmann
-date: June 2024
+date: August 2024
 ---
 
 ```{r setup, include=FALSE, echo = FALSE}
@@ -12,9 +12,9 @@ library(rstan)
 library(ggplot2)
 ```
 
-# Hierarchical Bayesian Models Wave 1
+# Hierarchical Bayesian Models Wave 2
 
-This document runs the models used to analyse the main outcomes for Wave 1.   
+This document runs the models used to analyse the main outcomes for Wave 2.   
 The structure of the document follows the Analysis_Plans.txt file.   
 The variables in the datasets are explained in Meta-Data.txt.  
 <!-- ADD DETAILS The STAN files with the model formulas are...--> 
@@ -39,7 +39,7 @@ The explainer variables are:
 project_path <- gsub("/stats","", getwd())
 
 #Read the data
-data <- read.csv(paste(project_path, "/cleaned_data/W1_Set1_AllData.csv", sep = "")) 
+data <- read.csv(paste(project_path, "/cleaned_data/W2_Set1_AllData.csv", sep = "")) 
 
 # Prepare all objects for the model
 
@@ -380,7 +380,12 @@ print(fit)
 **Year 4 N** = `r length(data$Current_Year[data$Current_Year == 'Final Year']) - sum(is.na(data$os_learnt[data$Current_Year == 'Final Year']))`  
   
   
-The output shows that all beta credibility intervals do cross 0. The results are non-significant.  
+The output shows that beta credibility intervals do not cross 0 only for the interaction term.  
+2.5% = `r output_summary['beta3','2.5%'] `  
+97.5% = `r output_summary['beta3','97.5%'] `    
+  
+  
+The interpretation is that students who attend a UKRN affiliated university are more likely to have learned about open science in the later years of education. For students who attend a non-URKN affiliated university, there is no difference.  
 
 
 ```{r OS Learnt effect, include = FALSE}
@@ -924,13 +929,8 @@ print(fit)
 **Placement Year N** = `r length(data$Current_Year[data$Current_Year == 'Placement Year']) - sum(is.na(data$applicability[data$Current_Year == 'Placement Year']))`  
 **Year 4 N** = `r length(data$Current_Year[data$Current_Year == 'Final Year']) - sum(is.na(data$applicability[data$Current_Year == 'Final Year']))`  
   
-  
-The output shows that beta credibility intervals do not cross 0 only for the interaction term.  
-2.5% = `r output_summary['beta3','2.5%'] `  
-97.5% = `r output_summary['beta3','97.5%'] `    
-  
-  
-The interpretation is that students who attend a UKRN affiliated university are more likely to think that the issues around open and reproducible research are applicable to their work in the later years of education. For students who attend a non-URKN affiliated university, there is no difference.  
+The output shows that all beta credibility intervals do cross 0. No significant results.  
+
 
 
 ```{r Set_1 Applicability effect, include = FALSE}
@@ -1148,7 +1148,7 @@ The explainer variables are:
 project_path <- gsub("/stats","", getwd())
 
 #Read the data
-data <- read.csv(paste(project_path, "/cleaned_data/W1_Set2_Awareness.csv", sep = "")) 
+data <- read.csv(paste(project_path, "/cleaned_data/W2_Set2_Awareness.csv", sep = "")) 
 
 # Prepare all objects
 
@@ -1211,16 +1211,7 @@ print(fit)
 **Year 4 N** = `r length(data$Current_Year[data$Current_Year == 'Final Year'])`  
   
      
-The output shows that beta credibility intervals do not cross 0 only for the interaction term.  
-2.5% = `r output_summary['beta3','2.5%'] `  
-97.5% = `r output_summary['beta3','97.5%'] `   
-
-
-The interpretation is that students who attend a UKRN affiliated university are more likely to be aware of the issues around open and reproducible research in the later years of education. For students who attend a non-URKN affiliated university, there is no difference.  
-  
-\textcolor{red}{
-13 divergent transitions.  
-}
+The output shows that all beta credibility intervals do cross 0. No significant results.  
 
 ```{r Set_2 Awareness effect, include = FALSE}
 #Make plots for UKRN vs Non-UKRN - how does the probability differ for the different years 
@@ -1436,7 +1427,7 @@ The explainer variables are:
 project_path <- gsub("/stats","", getwd())
 
 #Read the data
-data <- read.csv(paste(project_path, "/cleaned_data/W1_Set2_Experience.csv", sep = "")) 
+data <- read.csv(paste(project_path, "/cleaned_data/W2_Set2_Experience.csv", sep = "")) 
 
 # Prepare all objects
 
@@ -1500,12 +1491,12 @@ print(fit)
 
 The output shows that all beta credibility intervals cross 0.  
 
-\textcolor{red}{2400 divergent transitions. In addition:  
--  There were 2 chains where the estimated Bayesian Fraction of Missing Information was low.  
--  The largest R-hat is 1.05, indicating chains have not mixed. Running the chains for more iterations may help.  
--  Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.  
--  Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.  
-}
+The output shows that beta credibility intervals do not cross 0 only for the effect of year of study.  
+2.5% = `r output_summary['beta2','2.5%'] `  
+97.5% = `r output_summary['beta2','97.5%'] `    
+  
+  
+The interpretation is that students are more likely to have experience with open science practices in the later years of education regardless of whether they are in a UKRN or non-UKRN university. 
   
 
 ```{r Set_2 experience effect, include = FALSE}
@@ -1723,12 +1714,7 @@ The explainer variables are:
 project_path <- gsub("/stats","", getwd())
 
 #Read the data
-data <- read.csv(paste(project_path, "/cleaned_data/W1_Set2_ConceptualPerception.csv", sep = "")) 
-
-#fix the mean because it's not calculated correctly - keep limits -2 and 2
-data$Perception_Score_Mean <- data$Perception_Score_Total/16
-
-#in Stan code set the limits as L = -2.001 and U = 2.001
+data <- read.csv(paste(project_path, "/cleaned_data/W2_Set2_ConceptualPerception.csv", sep = "")) 
 
 
 # Logistic multilevel model simulations
@@ -1791,10 +1777,13 @@ print(fit)
 **Placement Year N** = `r length(data$Current_Year[data$Current_Year == 'Placement Year'])`  
 **Year 4 N** = `r length(data$Current_Year[data$Current_Year == 'Final Year'])`  
 
-The output shows that all beta credibility intervals cross 0.  
-
-\textcolor{red}{46 divergent transitions.  
-}
+The output shows that beta credibility intervals do not cross 0 only for the effect of year of study.  
+2.5% = `r output_summary['beta2','2.5%'] `  
+97.5% = `r output_summary['beta2','97.5%'] `    
+  
+  
+The interpretation is that students are more likely to have positive perceptions of open science practices in the later years of education regardless of whether they are in a UKRN or non-UKRN university.  
+  
 
 ```{r Conceptual perception effect, include = FALSE}
 #Make plots for UKRN vs Non-UKRN - how does the probability differ for the different years 
@@ -2010,10 +1999,9 @@ The explainer variables are:
 project_path <- gsub("/stats","", getwd())
 
 #Read the data
-data <- read.csv(paste(project_path, "/cleaned_data/W1_Set2_SituationalPerception.csv", sep = "")) 
+data <- read.csv(paste(project_path, "/cleaned_data/W2_Set2_SituationalPerception.csv", sep = "")) 
 
-#fix the mean because it's not calculated correctly - keep limits -2 and 2
-data$Knowledge_Score_Mean <- data$Knowledge_Score_Total/8
+
 
 #in Stan code set the limits as L = -2.001 and U = 2.001
 
@@ -2078,12 +2066,12 @@ print(fit)
 **Placement Year N** = `r length(data$Current_Year[data$Current_Year == 'Placement Year'])`  
 **Year 4 N** = `r length(data$Current_Year[data$Current_Year == 'Final Year'])`  
 
-The output shows that beta credibility intervals do not cross 0 only for the interaction term.  
-2.5% = `r output_summary['beta3','2.5%'] `  
-97.5% = `r output_summary['beta3','97.5%'] `   
-
-
-The interpretation is that students who attend a UKRN affiliated university are more likely to have positive situational perceptions of open and reproducible practices in the later years of education. For students who attend a non-URKN affiliated university, there is no difference.  
+The output shows that beta credibility intervals do not cross 0 only for the effect of year of study.  
+2.5% = `r output_summary['beta2','2.5%'] `  
+97.5% = `r output_summary['beta2','97.5%'] `    
+  
+  
+The interpretation is that students are more likely to have positive perceptions of open science practices in the later years of education regardless of whether they are in a UKRN or non-UKRN university.   
 
 ```{r Situational perception effect, include = FALSE}
 #Make plots for UKRN vs Non-UKRN - how does the probability differ for the different years 
