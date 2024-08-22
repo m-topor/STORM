@@ -12,9 +12,9 @@ library(rstan)
 library(ggplot2)
 ```
 
-# Hierarchical Bayesian Models Wave 1
+# Hierarchical Bayesian Models Wave 3
 
-This document runs the models used to analyse the main outcomes for Wave 1.   
+This document runs the models used to analyse the main outcomes for Wave 3.   
 The structure of the document follows the Analysis_Plans.txt file.   
 The variables in the datasets are explained in Meta-Data.txt.  
 <!-- ADD DETAILS The STAN files with the model formulas are...--> 
@@ -26,10 +26,8 @@ The variables in the datasets are explained in Meta-Data.txt.
 
 Bayesian Logistic regression for whether participants were aware of the reproducibility crisis or not (yes/no). 
 The explainer variables are:  
-* Whether the participant was at a university that was affiliated with the UKRN  
 * Whether the participant was in their first, second, placement or third year  
-* Interaction between the two variables above  
-  
+
   
     
 ```{r Set_1 Crisis Aware, include = FALSE}
@@ -39,7 +37,7 @@ The explainer variables are:
 project_path <- gsub("/stats","", getwd())
 
 #Read the data
-data <- read.csv(paste(project_path, "/cleaned_data/W1_Set1_AllData.csv", sep = "")) 
+data <- read.csv(paste(project_path, "/cleaned_data/W3_Set1_AllData.csv", sep = "")) 
 
 # Prepare all objects for the model
 
@@ -94,22 +92,16 @@ print(fit)
 **Number of participants in the analysis**    
   
 **Total N** = `r length(data$ID) - sum(is.na(data$crisis_aware))`  
-**UKRN N** = `r length(data$UKRN[data$UKRN == 'UKRN']) - sum(is.na(data$crisis_aware[data$UKRN == 'UKRN']))`  
-**Non-UKRN N** = `r length(data$UKRN[data$UKRN == 'Non-UKRN']) - sum(is.na(data$crisis_aware[data$UKRN == 'Non-UKRN']))`  
 **Year 1 N** = `r length(data$Current_Year[data$Current_Year == 'Year 1']) - sum(is.na(data$crisis_aware[data$Current_Year == 'Year 1']))`  
 **Year 2 N** = `r length(data$Current_Year[data$Current_Year == 'Year 2']) - sum(is.na(data$crisis_aware[data$Current_Year == 'Year 2']))`  
 **Placement Year N** = `r length(data$Current_Year[data$Current_Year == 'Placement Year']) - sum(is.na(data$crisis_aware[data$Current_Year == 'Placement Year']))`  
 **Year 4 N** = `r length(data$Current_Year[data$Current_Year == 'Final Year']) - sum(is.na(data$crisis_aware[data$Current_Year == 'Final Year']))`  
   
   
-The output shows that beta credibility intervals do not cross 0 only for the interaction term.  
-2.5% = `r output_summary['beta3','2.5%'] `  
-97.5% = `r output_summary['beta3','97.5%'] `    
+The output shows no significant results. 
   
   
-The interpretation is that students who attend a UKRN affiliated university are more likely to be aware of the reproducibility crisis in the later years of education. For students who attend a non-URKN affiliated university, there is no difference.  
-  
-  
+
 ```{r Crisis Aware effect, include = FALSE}
 #Make plots for UKRN vs Non-UKRN - how does the probability differ for the different years 
 # y axis would be probability and x axis would be years 
@@ -123,16 +115,16 @@ The interpretation is that students who attend a UKRN affiliated university are 
 
 #sort the draws 
 # make mu into a matrix with just one column
-mu_all <- as.data.frame(sort(ParDraws[["mu"]]))
+mu_all <- as.data.frame(ParDraws[["mu"]])
 colnames(mu_all) <- 'mu'
 mu_all <- as.matrix(mu_all)
 
 #make the betas into a matrix with 20 000 rows for draws and 3 columns for betas
 all_beta <- as.data.frame(matrix(data = NA, nrow = 20000, ncol =3))
 colnames(all_beta) <- c('beta1', 'beta2', 'beta3')
-all_beta$beta1 <-  sort(ParDraws[["beta1"]])
-all_beta$beta2 <-  sort(ParDraws[["beta2"]])
-all_beta$beta3 <-  sort(ParDraws[["beta3"]])
+all_beta$beta1 <-  ParDraws[["beta1"]]
+all_beta$beta2 <-  ParDraws[["beta2"]]
+all_beta$beta3 <-  ParDraws[["beta3"]]
 
 all_beta <- as.matrix(all_beta)
 
@@ -154,13 +146,15 @@ X <- as.data.frame(matrix(data = NA, nrow =3, ncol = 1))
 X$V1 <-  c(1, 1, (1*1)) # [D x D*x]
 X <- as.matrix(X)
 
-matrix1 <- all_beta %*% X
+matrix1 <- all_beta %*% X 
 matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y1 <- p_all[500] 
-prob97.5_UKRN_Y1 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y1 <- p_all_sorted[500] 
+prob97.5_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2 at 2.5% and 97.5%
@@ -175,8 +169,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2 <- p_all[500]
-prob97.5_UKRN_Y2 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2.5 at 2.5% and 97.5%
@@ -191,8 +187,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2.5 <- p_all[500]
-prob97.5_UKRN_Y2.5 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 3 at 2.5% and 97.5%
@@ -207,8 +205,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y3 <- p_all[500]
-prob97.5_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_UKRN_Y3 <- p_all_sorted[19500]
 
 
 #-------------NON-UKRN VALUES----------------------
@@ -225,9 +225,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y1 <- p_all[500]
-prob97.5_N_UKRN_Y1 <- p_all[19500]
+prob2.5_N_UKRN_Y1 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2 at 2.5% and 97.5%
@@ -242,9 +243,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2 <- p_all[500]
-prob97.5_N_UKRN_Y2 <- p_all[19500]
+prob2.5_N_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2.5 at 2.5% and 97.5%
@@ -259,9 +261,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2.5 <- p_all[500]
-prob97.5_N_UKRN_Y2.5 <- p_all[19500]
+prob2.5_N_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 3 at 2.5% and 97.5%
@@ -276,8 +279,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_N_UKRN_Y3 <- p_all[500]
-prob97.5_N_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_N_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y3 <- p_all_sorted[19500]
 
 
 
@@ -293,7 +298,7 @@ cred_int$Percent <- as.factor(cred_int$Percent)
 
 crisis_aware_plot <- ggplot(cred_int, aes(x=Year, y=Prob, shape = Percent, color = UKRN)) +
                       geom_point(aes(size=UKRN)) +
-                      geom_smooth(method=NULL, se=FALSE, fullrange=TRUE) +
+                      geom_line() +
                       scale_size_manual(values=c(3,3)) +
                       theme_classic()
 ```
@@ -381,6 +386,18 @@ print(fit)
   
   
 The output shows that all beta credibility intervals do cross 0. The results are non-significant.  
+  
+\textcolor{red}{
+There were no errors here but the models took a long time to process and the result shows high Rhat values. The results also look quite strange with very large values for Beta 1 and Beta 2.
+}
+
+The output shows that beta credibility intervals do not cross 0 for Beta 2 but in the negative direction. This seems to suggest that likelihood of learning about open science is larger in earlier years of education at university  
+2.5% = `r output_summary['beta2','2.5%'] `  
+97.5% = `r output_summary['beta2','97.5%'] ` 
+
+There is also a significant interaction for Beta 3 in the positive direction suggesting that the likelihood goes up with the year of study for UKRN universities.
+2.5% = `r output_summary['beta3','2.5%'] `  
+97.5% = `r output_summary['beta3','97.5%'] ` 
 
 
 ```{r OS Learnt effect, include = FALSE}
@@ -396,16 +413,16 @@ The output shows that all beta credibility intervals do cross 0. The results are
 
 #sort the draws 
 # make mu into a matrix with just one column
-mu_all <- as.data.frame(sort(ParDraws[["mu"]]))
+mu_all <- as.data.frame(ParDraws[["mu"]])
 colnames(mu_all) <- 'mu'
 mu_all <- as.matrix(mu_all)
 
 #make the betas into a matrix with 20 000 rows for draws and 3 columns for betas
 all_beta <- as.data.frame(matrix(data = NA, nrow = 20000, ncol =3))
 colnames(all_beta) <- c('beta1', 'beta2', 'beta3')
-all_beta$beta1 <-  sort(ParDraws[["beta1"]])
-all_beta$beta2 <-  sort(ParDraws[["beta2"]])
-all_beta$beta3 <-  sort(ParDraws[["beta3"]])
+all_beta$beta1 <-  ParDraws[["beta1"]]
+all_beta$beta2 <-  ParDraws[["beta2"]]
+all_beta$beta3 <-  ParDraws[["beta3"]]
 
 all_beta <- as.matrix(all_beta)
 
@@ -432,8 +449,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y1 <- p_all[500] 
-prob97.5_UKRN_Y1 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y1 <- p_all_sorted[500] 
+prob97.5_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2 at 2.5% and 97.5%
@@ -448,8 +467,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2 <- p_all[500]
-prob97.5_UKRN_Y2 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2.5 at 2.5% and 97.5%
@@ -464,8 +485,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2.5 <- p_all[500]
-prob97.5_UKRN_Y2.5 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 3 at 2.5% and 97.5%
@@ -480,8 +503,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y3 <- p_all[500]
-prob97.5_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_UKRN_Y3 <- p_all_sorted[19500]
 
 
 #-------------NON-UKRN VALUES----------------------
@@ -498,9 +523,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y1 <- p_all[500]
-prob97.5_N_UKRN_Y1 <- p_all[19500]
+prob2.5_N_UKRN_Y1 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2 at 2.5% and 97.5%
@@ -515,9 +541,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2 <- p_all[500]
-prob97.5_N_UKRN_Y2 <- p_all[19500]
+prob2.5_N_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2.5 at 2.5% and 97.5%
@@ -532,9 +559,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2.5 <- p_all[500]
-prob97.5_N_UKRN_Y2.5 <- p_all[19500]
+prob2.5_N_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 3 at 2.5% and 97.5%
@@ -549,8 +577,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_N_UKRN_Y3 <- p_all[500]
-prob97.5_N_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_N_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y3 <- p_all_sorted[19500]
 
 
 
@@ -566,7 +596,7 @@ cred_int$Percent <- as.factor(cred_int$Percent)
 
 OS_learnt_plot <- ggplot(cred_int, aes(x=Year, y=Prob, shape = Percent, color = UKRN)) +
                       geom_point(aes(size=UKRN)) +
-                      geom_smooth(method=NULL, se=FALSE, fullrange=TRUE) +
+                      geom_line() +
                       scale_size_manual(values=c(3,3)) +
                       theme_classic()
 ```
@@ -668,16 +698,16 @@ The output shows that all beta credibility intervals do cross 0. No significant 
 
 #sort the draws 
 # make mu into a matrix with just one column
-mu_all <- as.data.frame(sort(ParDraws[["mu"]]))
+mu_all <- as.data.frame(ParDraws[["mu"]])
 colnames(mu_all) <- 'mu'
 mu_all <- as.matrix(mu_all)
 
 #make the betas into a matrix with 20 000 rows for draws and 3 columns for betas
 all_beta <- as.data.frame(matrix(data = NA, nrow = 20000, ncol =3))
 colnames(all_beta) <- c('beta1', 'beta2', 'beta3')
-all_beta$beta1 <-  sort(ParDraws[["beta1"]])
-all_beta$beta2 <-  sort(ParDraws[["beta2"]])
-all_beta$beta3 <-  sort(ParDraws[["beta3"]])
+all_beta$beta1 <-  ParDraws[["beta1"]]
+all_beta$beta2 <-  ParDraws[["beta2"]]
+all_beta$beta3 <-  ParDraws[["beta3"]]
 
 all_beta <- as.matrix(all_beta)
 
@@ -704,8 +734,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y1 <- p_all[500] 
-prob97.5_UKRN_Y1 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y1 <- p_all_sorted[500] 
+prob97.5_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2 at 2.5% and 97.5%
@@ -720,8 +752,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2 <- p_all[500]
-prob97.5_UKRN_Y2 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2.5 at 2.5% and 97.5%
@@ -736,8 +770,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2.5 <- p_all[500]
-prob97.5_UKRN_Y2.5 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 3 at 2.5% and 97.5%
@@ -752,8 +788,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y3 <- p_all[500]
-prob97.5_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_UKRN_Y3 <- p_all_sorted[19500]
 
 
 #-------------NON-UKRN VALUES----------------------
@@ -770,9 +808,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y1 <- p_all[500]
-prob97.5_N_UKRN_Y1 <- p_all[19500]
+prob2.5_N_UKRN_Y1 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2 at 2.5% and 97.5%
@@ -787,9 +826,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2 <- p_all[500]
-prob97.5_N_UKRN_Y2 <- p_all[19500]
+prob2.5_N_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2.5 at 2.5% and 97.5%
@@ -804,9 +844,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2.5 <- p_all[500]
-prob97.5_N_UKRN_Y2.5 <- p_all[19500]
+prob2.5_N_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 3 at 2.5% and 97.5%
@@ -821,8 +862,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_N_UKRN_Y3 <- p_all[500]
-prob97.5_N_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_N_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y3 <- p_all_sorted[19500]
 
 
 
@@ -838,7 +881,7 @@ cred_int$Percent <- as.factor(cred_int$Percent)
 
 OS_explain_plot <- ggplot(cred_int, aes(x=Year, y=Prob, shape = Percent, color = UKRN)) +
                       geom_point(aes(size=UKRN)) +
-                      geom_smooth(method=NULL, se=FALSE, fullrange=TRUE) +
+                      geom_line() +
                       scale_size_manual(values=c(3,3)) +
                       theme_classic()
 ```
@@ -946,16 +989,16 @@ The interpretation is that students who attend a UKRN affiliated university are 
 
 #sort the draws 
 # make mu into a matrix with just one column
-mu_all <- as.data.frame(sort(ParDraws[["mu"]]))
+mu_all <- as.data.frame(ParDraws[["mu"]])
 colnames(mu_all) <- 'mu'
 mu_all <- as.matrix(mu_all)
 
 #make the betas into a matrix with 20 000 rows for draws and 3 columns for betas
 all_beta <- as.data.frame(matrix(data = NA, nrow = 20000, ncol =3))
 colnames(all_beta) <- c('beta1', 'beta2', 'beta3')
-all_beta$beta1 <-  sort(ParDraws[["beta1"]])
-all_beta$beta2 <-  sort(ParDraws[["beta2"]])
-all_beta$beta3 <-  sort(ParDraws[["beta3"]])
+all_beta$beta1 <-  ParDraws[["beta1"]]
+all_beta$beta2 <-  ParDraws[["beta2"]]
+all_beta$beta3 <-  ParDraws[["beta3"]]
 
 all_beta <- as.matrix(all_beta)
 
@@ -982,8 +1025,11 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y1 <- p_all[500] 
-prob97.5_UKRN_Y1 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+
+prob2.5_UKRN_Y1 <- p_all_sorted[500] 
+prob97.5_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2 at 2.5% and 97.5%
@@ -998,8 +1044,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2 <- p_all[500]
-prob97.5_UKRN_Y2 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2.5 at 2.5% and 97.5%
@@ -1014,8 +1062,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2.5 <- p_all[500]
-prob97.5_UKRN_Y2.5 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 3 at 2.5% and 97.5%
@@ -1030,8 +1080,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y3 <- p_all[500]
-prob97.5_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_UKRN_Y3 <- p_all_sorted[19500]
 
 
 #-------------NON-UKRN VALUES----------------------
@@ -1048,9 +1100,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y1 <- p_all[500]
-prob97.5_N_UKRN_Y1 <- p_all[19500]
+prob2.5_N_UKRN_Y1 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2 at 2.5% and 97.5%
@@ -1065,9 +1118,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2 <- p_all[500]
-prob97.5_N_UKRN_Y2 <- p_all[19500]
+prob2.5_N_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2.5 at 2.5% and 97.5%
@@ -1082,9 +1136,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2.5 <- p_all[500]
-prob97.5_N_UKRN_Y2.5 <- p_all[19500]
+prob2.5_N_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 3 at 2.5% and 97.5%
@@ -1099,8 +1154,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_N_UKRN_Y3 <- p_all[500]
-prob97.5_N_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_N_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y3 <- p_all_sorted[19500]
 
 
 
@@ -1116,7 +1173,7 @@ cred_int$Percent <- as.factor(cred_int$Percent)
 
 applicability_plot <- ggplot(cred_int, aes(x=Year, y=Prob, shape = Percent, color = UKRN)) +
                       geom_point(aes(size=UKRN)) +
-                      geom_smooth(method=NULL, se=FALSE, fullrange=TRUE) +
+                      geom_line() +
                       scale_size_manual(values=c(3,3)) +
                       theme_classic()
 ```
@@ -1148,7 +1205,7 @@ The explainer variables are:
 project_path <- gsub("/stats","", getwd())
 
 #Read the data
-data <- read.csv(paste(project_path, "/cleaned_data/W1_Set2_Awareness.csv", sep = "")) 
+data <- read.csv(paste(project_path, "/cleaned_data/W3_Set2_Awareness.csv", sep = "")) 
 
 # Prepare all objects
 
@@ -1190,7 +1247,7 @@ fit <- stan(file="STORM_truncPoisson.stan",data=data2, warmup=warmup,iter=niter,
 output_summary <- summary(fit)
 output_summary <- as.data.frame(output_summary[["summary"]])
 
-ParDraws <- extract(fit)
+ParDraws <- rstan::extract(fit)
 
 ```
 
@@ -1210,6 +1267,7 @@ print(fit)
 **Placement Year N** = `r length(data$Current_Year[data$Current_Year == 'Placement Year'])`  
 **Year 4 N** = `r length(data$Current_Year[data$Current_Year == 'Final Year'])`  
   
+`r knitr::kable(table(data$Awareness_Score_Total))`
      
 The output shows that beta credibility intervals do not cross 0 only for the interaction term.  
 2.5% = `r output_summary['beta3','2.5%'] `  
@@ -1219,7 +1277,8 @@ The output shows that beta credibility intervals do not cross 0 only for the int
 The interpretation is that students who attend a UKRN affiliated university are more likely to be aware of the issues around open and reproducible research in the later years of education. For students who attend a non-URKN affiliated university, there is no difference.  
   
 \textcolor{red}{
-13 divergent transitions.  
+There were 4 divergent transitions after warmup.
+
 }
 
 ```{r Set_2 Awareness effect, include = FALSE}
@@ -1235,16 +1294,16 @@ The interpretation is that students who attend a UKRN affiliated university are 
 
 #sort the draws 
 # make mu into a matrix with just one column
-mu_all <- as.data.frame(sort(ParDraws[["mu"]]))
+mu_all <- as.data.frame(ParDraws[["mu"]])
 colnames(mu_all) <- 'mu'
 mu_all <- as.matrix(mu_all)
 
 #make the betas into a matrix with 20 000 rows for draws and 3 columns for betas
 all_beta <- as.data.frame(matrix(data = NA, nrow = 20000, ncol =3))
 colnames(all_beta) <- c('beta1', 'beta2', 'beta3')
-all_beta$beta1 <-  sort(ParDraws[["beta1"]])
-all_beta$beta2 <-  sort(ParDraws[["beta2"]])
-all_beta$beta3 <-  sort(ParDraws[["beta3"]])
+all_beta$beta1 <-  ParDraws[["beta1"]]
+all_beta$beta2 <-  ParDraws[["beta2"]]
+all_beta$beta3 <-  ParDraws[["beta3"]]
 
 all_beta <- as.matrix(all_beta)
 
@@ -1271,8 +1330,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y1 <- p_all[500] 
-prob97.5_UKRN_Y1 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y1 <- p_all_sorted[500] 
+prob97.5_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2 at 2.5% and 97.5%
@@ -1287,8 +1348,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2 <- p_all[500]
-prob97.5_UKRN_Y2 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2.5 at 2.5% and 97.5%
@@ -1303,8 +1366,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2.5 <- p_all[500]
-prob97.5_UKRN_Y2.5 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 3 at 2.5% and 97.5%
@@ -1319,8 +1384,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y3 <- p_all[500]
-prob97.5_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_UKRN_Y3 <- p_all_sorted[19500]
 
 
 #-------------NON-UKRN VALUES----------------------
@@ -1337,9 +1404,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y1 <- p_all[500]
-prob97.5_N_UKRN_Y1 <- p_all[19500]
+prob2.5_N_UKRN_Y1 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2 at 2.5% and 97.5%
@@ -1354,9 +1422,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2 <- p_all[500]
-prob97.5_N_UKRN_Y2 <- p_all[19500]
+prob2.5_N_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2.5 at 2.5% and 97.5%
@@ -1371,9 +1440,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2.5 <- p_all[500]
-prob97.5_N_UKRN_Y2.5 <- p_all[19500]
+prob2.5_N_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 3 at 2.5% and 97.5%
@@ -1388,8 +1458,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_N_UKRN_Y3 <- p_all[500]
-prob97.5_N_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_N_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y3 <- p_all_sorted[19500]
 
 
 
@@ -1405,7 +1477,7 @@ cred_int$Percent <- as.factor(cred_int$Percent)
 
 awareness_plot <- ggplot(cred_int, aes(x=Year, y=Prob, shape = Percent, color = UKRN)) +
                       geom_point(aes(size=UKRN)) +
-                      geom_smooth(method=NULL, se=FALSE, fullrange=TRUE) +
+                      geom_line() +
                       scale_size_manual(values=c(3,3)) +
                       theme_classic()
 ```
@@ -1436,7 +1508,7 @@ The explainer variables are:
 project_path <- gsub("/stats","", getwd())
 
 #Read the data
-data <- read.csv(paste(project_path, "/cleaned_data/W1_Set2_Experience.csv", sep = "")) 
+data <- read.csv(paste(project_path, "/cleaned_data/W3_Set2_Experience.csv", sep = "")) 
 
 # Prepare all objects
 
@@ -1478,7 +1550,7 @@ fit <- stan(file="STORM_truncPoisson.stan",data=data2, warmup=warmup,iter=niter,
 output_summary <- summary(fit)
 output_summary <- as.data.frame(output_summary[["summary"]])
 
-ParDraws <- extract(fit)
+ParDraws <- rstan::extract(fit)
 
 ```
 
@@ -1498,13 +1570,13 @@ print(fit)
 **Placement Year N** = `r length(data$Current_Year[data$Current_Year == 'Placement Year'])`  
 **Year 4 N** = `r length(data$Current_Year[data$Current_Year == 'Final Year'])`  
 
+`r knitr::kable(table(data$Experience_Score_Total))`
+
 The output shows that all beta credibility intervals cross 0.  
 
-\textcolor{red}{2400 divergent transitions. In addition:  
--  There were 2 chains where the estimated Bayesian Fraction of Missing Information was low.  
--  The largest R-hat is 1.05, indicating chains have not mixed. Running the chains for more iterations may help.  
--  Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.  
--  Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.  
+\textcolor{red}{
+There were 4 divergent transitions after warmup.
+
 }
   
 
@@ -1521,16 +1593,16 @@ The output shows that all beta credibility intervals cross 0.
 
 #sort the draws 
 # make mu into a matrix with just one column
-mu_all <- as.data.frame(sort(ParDraws[["mu"]]))
+mu_all <- as.data.frame(ParDraws[["mu"]])
 colnames(mu_all) <- 'mu'
 mu_all <- as.matrix(mu_all)
 
 #make the betas into a matrix with 20 000 rows for draws and 3 columns for betas
 all_beta <- as.data.frame(matrix(data = NA, nrow = 20000, ncol =3))
 colnames(all_beta) <- c('beta1', 'beta2', 'beta3')
-all_beta$beta1 <-  sort(ParDraws[["beta1"]])
-all_beta$beta2 <-  sort(ParDraws[["beta2"]])
-all_beta$beta3 <-  sort(ParDraws[["beta3"]])
+all_beta$beta1 <-  ParDraws[["beta1"]]
+all_beta$beta2 <-  ParDraws[["beta2"]]
+all_beta$beta3 <-  ParDraws[["beta3"]]
 
 all_beta <- as.matrix(all_beta)
 
@@ -1557,8 +1629,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y1 <- p_all[500] 
-prob97.5_UKRN_Y1 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y1 <- p_all_sorted[500] 
+prob97.5_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2 at 2.5% and 97.5%
@@ -1573,8 +1647,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2 <- p_all[500]
-prob97.5_UKRN_Y2 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2.5 at 2.5% and 97.5%
@@ -1589,8 +1665,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2.5 <- p_all[500]
-prob97.5_UKRN_Y2.5 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 3 at 2.5% and 97.5%
@@ -1605,8 +1683,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y3 <- p_all[500]
-prob97.5_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_UKRN_Y3 <- p_all_sorted[19500]
 
 
 #-------------NON-UKRN VALUES----------------------
@@ -1623,9 +1703,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y1 <- p_all[500]
-prob97.5_N_UKRN_Y1 <- p_all[19500]
+prob2.5_N_UKRN_Y1 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2 at 2.5% and 97.5%
@@ -1640,9 +1721,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2 <- p_all[500]
-prob97.5_N_UKRN_Y2 <- p_all[19500]
+prob2.5_N_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2.5 at 2.5% and 97.5%
@@ -1657,9 +1739,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2.5 <- p_all[500]
-prob97.5_N_UKRN_Y2.5 <- p_all[19500]
+prob2.5_N_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 3 at 2.5% and 97.5%
@@ -1674,8 +1757,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_N_UKRN_Y3 <- p_all[500]
-prob97.5_N_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_N_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y3 <- p_all_sorted[19500]
 
 
 
@@ -1691,7 +1776,7 @@ cred_int$Percent <- as.factor(cred_int$Percent)
 
 experience_plot <- ggplot(cred_int, aes(x=Year, y=Prob, shape = Percent, color = UKRN)) +
                       geom_point(aes(size=UKRN)) +
-                      geom_smooth(method=NULL, se=FALSE, fullrange=TRUE) +
+                      geom_line() +
                       scale_size_manual(values=c(3,3)) +
                       theme_classic()
 ```
@@ -1723,7 +1808,7 @@ The explainer variables are:
 project_path <- gsub("/stats","", getwd())
 
 #Read the data
-data <- read.csv(paste(project_path, "/cleaned_data/W1_Set2_ConceptualPerception.csv", sep = "")) 
+data <- read.csv(paste(project_path, "/cleaned_data/W3_Set2_ConceptualPerception.csv", sep = "")) 
 
 #fix the mean because it's not calculated correctly - keep limits -2 and 2
 data$Perception_Score_Mean <- data$Perception_Score_Total/16
@@ -1771,7 +1856,7 @@ fit <- stan(file="STORM_truncRegr.stan",data=data2, warmup=warmup,iter=niter,cha
 output_summary <- summary(fit)
 output_summary <- as.data.frame(output_summary[["summary"]])
 
-ParDraws <- extract(fit)
+ParDraws <- rstan::extract(fit)
 
 ```
 
@@ -1793,7 +1878,7 @@ print(fit)
 
 The output shows that all beta credibility intervals cross 0.  
 
-\textcolor{red}{46 divergent transitions.  
+\textcolor{red}{6 divergent transitions.  
 }
 
 ```{r Conceptual perception effect, include = FALSE}
@@ -1809,16 +1894,16 @@ The output shows that all beta credibility intervals cross 0.
 
 #sort the draws 
 # make mu into a matrix with just one column
-mu_all <- as.data.frame(sort(ParDraws[["mu"]]))
+mu_all <- as.data.frame(ParDraws[["mu"]])
 colnames(mu_all) <- 'mu'
 mu_all <- as.matrix(mu_all)
 
 #make the betas into a matrix with 20 000 rows for draws and 3 columns for betas
 all_beta <- as.data.frame(matrix(data = NA, nrow = 20000, ncol =3))
 colnames(all_beta) <- c('beta1', 'beta2', 'beta3')
-all_beta$beta1 <-  sort(ParDraws[["beta1"]])
-all_beta$beta2 <-  sort(ParDraws[["beta2"]])
-all_beta$beta3 <-  sort(ParDraws[["beta3"]])
+all_beta$beta1 <-  ParDraws[["beta1"]]
+all_beta$beta2 <-  ParDraws[["beta2"]]
+all_beta$beta3 <-  ParDraws[["beta3"]]
 
 all_beta <- as.matrix(all_beta)
 
@@ -1845,8 +1930,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y1 <- p_all[500] 
-prob97.5_UKRN_Y1 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y1 <- p_all_sorted[500] 
+prob97.5_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2 at 2.5% and 97.5%
@@ -1861,8 +1948,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2 <- p_all[500]
-prob97.5_UKRN_Y2 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2.5 at 2.5% and 97.5%
@@ -1877,8 +1966,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2.5 <- p_all[500]
-prob97.5_UKRN_Y2.5 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 3 at 2.5% and 97.5%
@@ -1893,8 +1984,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y3 <- p_all[500]
-prob97.5_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_UKRN_Y3 <- p_all_sorted[19500]
 
 
 #-------------NON-UKRN VALUES----------------------
@@ -1911,9 +2004,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y1 <- p_all[500]
-prob97.5_N_UKRN_Y1 <- p_all[19500]
+prob2.5_N_UKRN_Y1 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2 at 2.5% and 97.5%
@@ -1928,9 +2022,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2 <- p_all[500]
-prob97.5_N_UKRN_Y2 <- p_all[19500]
+prob2.5_N_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2.5 at 2.5% and 97.5%
@@ -1945,9 +2040,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2.5 <- p_all[500]
-prob97.5_N_UKRN_Y2.5 <- p_all[19500]
+prob2.5_N_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 3 at 2.5% and 97.5%
@@ -1962,8 +2058,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_N_UKRN_Y3 <- p_all[500]
-prob97.5_N_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_N_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y3 <- p_all_sorted[19500]
 
 
 
@@ -1979,7 +2077,7 @@ cred_int$Percent <- as.factor(cred_int$Percent)
 
 concept_plot <- ggplot(cred_int, aes(x=Year, y=Prob, shape = Percent, color = UKRN)) +
                       geom_point(aes(size=UKRN)) +
-                      geom_smooth(method=NULL, se=FALSE, fullrange=TRUE) +
+                      geom_line() +
                       scale_size_manual(values=c(3,3)) +
                       theme_classic()
 ```
@@ -2010,7 +2108,7 @@ The explainer variables are:
 project_path <- gsub("/stats","", getwd())
 
 #Read the data
-data <- read.csv(paste(project_path, "/cleaned_data/W1_Set2_SituationalPerception.csv", sep = "")) 
+data <- read.csv(paste(project_path, "/cleaned_data/W3_Set2_SituationalPerception.csv", sep = "")) 
 
 #fix the mean because it's not calculated correctly - keep limits -2 and 2
 data$Knowledge_Score_Mean <- data$Knowledge_Score_Total/8
@@ -2057,7 +2155,7 @@ fit <- stan(file="STORM_truncRegr.stan",data=data2, warmup=warmup,iter=niter,cha
 output_summary <- summary(fit)
 output_summary <- as.data.frame(output_summary[["summary"]])
 
-ParDraws <- extract(fit)
+ParDraws <- rstan::extract(fit)
 
 ```
 
@@ -2078,12 +2176,10 @@ print(fit)
 **Placement Year N** = `r length(data$Current_Year[data$Current_Year == 'Placement Year'])`  
 **Year 4 N** = `r length(data$Current_Year[data$Current_Year == 'Final Year'])`  
 
-The output shows that beta credibility intervals do not cross 0 only for the interaction term.  
-2.5% = `r output_summary['beta3','2.5%'] `  
-97.5% = `r output_summary['beta3','97.5%'] `   
+The output shows that all beta credibility intervals cross 0.  
 
-
-The interpretation is that students who attend a UKRN affiliated university are more likely to have positive situational perceptions of open and reproducible practices in the later years of education. For students who attend a non-URKN affiliated university, there is no difference.  
+\textcolor{red}{11 divergent transitions.  
+}
 
 ```{r Situational perception effect, include = FALSE}
 #Make plots for UKRN vs Non-UKRN - how does the probability differ for the different years 
@@ -2098,16 +2194,16 @@ The interpretation is that students who attend a UKRN affiliated university are 
 
 #sort the draws 
 # make mu into a matrix with just one column
-mu_all <- as.data.frame(sort(ParDraws[["mu"]]))
+mu_all <- as.data.frame(ParDraws[["mu"]])
 colnames(mu_all) <- 'mu'
 mu_all <- as.matrix(mu_all)
 
 #make the betas into a matrix with 20 000 rows for draws and 3 columns for betas
 all_beta <- as.data.frame(matrix(data = NA, nrow = 20000, ncol =3))
 colnames(all_beta) <- c('beta1', 'beta2', 'beta3')
-all_beta$beta1 <-  sort(ParDraws[["beta1"]])
-all_beta$beta2 <-  sort(ParDraws[["beta2"]])
-all_beta$beta3 <-  sort(ParDraws[["beta3"]])
+all_beta$beta1 <-  ParDraws[["beta1"]]
+all_beta$beta2 <-  ParDraws[["beta2"]]
+all_beta$beta3 <-  ParDraws[["beta3"]]
 
 all_beta <- as.matrix(all_beta)
 
@@ -2134,8 +2230,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y1 <- p_all[500] 
-prob97.5_UKRN_Y1 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y1 <- p_all_sorted[500] 
+prob97.5_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2 at 2.5% and 97.5%
@@ -2150,8 +2248,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2 <- p_all[500]
-prob97.5_UKRN_Y2 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 2.5 at 2.5% and 97.5%
@@ -2166,8 +2266,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y2.5 <- p_all[500]
-prob97.5_UKRN_Y2.5 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for UKRN Year 3 at 2.5% and 97.5%
@@ -2182,8 +2284,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_UKRN_Y3 <- p_all[500]
-prob97.5_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_UKRN_Y3 <- p_all_sorted[19500]
 
 
 #-------------NON-UKRN VALUES----------------------
@@ -2200,9 +2304,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y1 <- p_all[500]
-prob97.5_N_UKRN_Y1 <- p_all[19500]
+prob2.5_N_UKRN_Y1 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y1 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2 at 2.5% and 97.5%
@@ -2217,9 +2322,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2 <- p_all[500]
-prob97.5_N_UKRN_Y2 <- p_all[19500]
+prob2.5_N_UKRN_Y2 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 2.5 at 2.5% and 97.5%
@@ -2234,9 +2340,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
+p_all_sorted <- sort(p_all)
 
-prob2.5_N_UKRN_Y2.5 <- p_all[500]
-prob97.5_N_UKRN_Y2.5 <- p_all[19500]
+prob2.5_N_UKRN_Y2.5 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y2.5 <- p_all_sorted[19500]
 
 
 #Probability for non-UKRN Year 3 at 2.5% and 97.5%
@@ -2251,8 +2358,10 @@ matrix2 <- matrix1 + mu_all
 
 p_all <- exp(matrix2)/(1+exp(matrix2)) 
 
-prob2.5_N_UKRN_Y3 <- p_all[500]
-prob97.5_N_UKRN_Y3 <- p_all[19500]
+p_all_sorted <- sort(p_all)
+
+prob2.5_N_UKRN_Y3 <- p_all_sorted[500]
+prob97.5_N_UKRN_Y3 <- p_all_sorted[19500]
 
 
 
@@ -2268,7 +2377,7 @@ cred_int$Percent <- as.factor(cred_int$Percent)
 
 situational_plot <- ggplot(cred_int, aes(x=Year, y=Prob, shape = Percent, color = UKRN)) +
                       geom_point(aes(size=UKRN)) +
-                      geom_smooth(method=NULL, se=FALSE, fullrange=TRUE) +
+                      geom_line() +
                       scale_size_manual(values=c(3,3)) +
                       theme_classic()
 ```

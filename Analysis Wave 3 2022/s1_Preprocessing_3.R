@@ -237,7 +237,7 @@ final_df <- recode2(final_df, fields = c('Perception_2', 'Perception_4', 'Percep
 final_df <- recode2(final_df, fields = c('Awareness_1', 'Awareness_2', 'Awareness_3', 
                                                        'Awareness_4', 'Awareness_5', 'Awareness_6', 
                                                        'Awareness_7', 'Awareness_8'), 
-                           recodes = "'1' = 1; '0' = 0")
+                           recodes = "'1' = 1; '' = 0") #here there was an issue in the way the answers were coded and empty spaces were 0
 
 #Experience of Open Research
 final_df <- recode2(final_df, fields = c('Experience_1', 'Experience_2', 'Experience_3', 
