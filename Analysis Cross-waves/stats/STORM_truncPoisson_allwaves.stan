@@ -18,8 +18,11 @@ parameters {
   real beta3;
 }
 model {
-  mu ~ normal(0, 100);
+  mu ~ normal(1, 2);
   sigma ~ exponential(1);
+  beta1 ~ normal(0, 1);
+  beta2 ~ normal(0, 1);
+  beta3 ~ normal(0, 1);
   for (l in 1:L) {
       alpha[l] ~ normal(mu, sigma);
   }

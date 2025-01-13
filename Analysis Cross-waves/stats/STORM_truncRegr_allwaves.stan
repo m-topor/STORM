@@ -3,9 +3,9 @@ data {
   int<lower=1> L; // number of universities
   real<lower=-2.001,upper=2.001> y[N]; // response variable
   int<lower=1,upper=L> ll[N]; // university number
-  int<lower=0,upper=1> D[N]; // dummy variable for cluster "yes"
-  real x[N]; // number of years at uni
-  real interact[N]; // interaction between D and x, i.e. D*x
+  int<lower=0,upper=1> D[N]; // dummy variable for "year 2"
+  int<lower=0,upper=1> D1[N]; // dummy variable for "2021"
+  int<lower=0,upper=1> D2[N]; // dummy variable for "2022"
 }
 parameters {
   real mu;
@@ -24,6 +24,6 @@ model {
       alpha[l] ~ normal(mu, sigma_a);
   }
   for (n in 1:N){
-    y[n] ~ normal(alpha[ll[n]] + beta1*D[n] + beta2*x[n] + beta3*interact[n], sigma) T[-2.001 , 2.001];
+    y[n] ~ normal(alpha[ll[n]] + beta1*D[n] + beta2*D1[n] + beta3*D2[n], sigma) T[-2.001 , 2.001];
   }
 }
