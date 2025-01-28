@@ -136,7 +136,7 @@ df_incl_cri_met <- df_incl_cri_met %>%
 #Filter out individuals who are doing an MSc student
 df_incl_cri_met <- df_incl_cri_met %>% 
   filter(!str_detect(Course_Name, "Msc|MSc|masters|Masters|MA Clinical Psychology"))
-#11 cases removed, 889 total
+#12 cases removed, 889 total
 
 #Now let's check if there are still 10 cases per each included uni
 

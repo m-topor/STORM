@@ -24,7 +24,7 @@ APPLIED TO:
 
 
 ----------------------Set 2: Awareness, Experience, ConceptualPerception & SituatinalPerception------------------
------For Set 2 - there are four data files for four main outcomes: Awareness, Experience, Conceptual Perception and Situatonal Perception
+-----For Set 2 - there are four data files for four main outcomes: Awareness, Experience, Conceptual Perception and Situational Perception
  
 
 --------First, we will address Awareness and Experience. Both variables are count variables on a scale of 0 to 8.

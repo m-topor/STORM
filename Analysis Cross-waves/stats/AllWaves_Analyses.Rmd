@@ -18,7 +18,244 @@ This document runs the models used to analyse the over time changes in perceptio
 The structure of the document follows the Analysis_Plans.txt file.   
 The variables in the datasets are explained in Meta-Data.txt.  
 <!-- ADD DETAILS The STAN files with the model formulas are...--> 
+
+## Data Set 1 - Binary Categorical Outcomes
   
+### Crisis aware
+
+Bayesian Logistic regression for whether participants were aware of the reproducibility crisis or not (yes/no). 
+The explainer variables are:  
+* Whether the participant was in their first or second year of study 
+* The year the survey was conducted - 2020, 2021 and 2022 
+
+  
+    
+```{r Set_1 Crisis Aware, include = FALSE}
+
+#Set the path for the Wave 1 files
+
+project_path <- gsub("/stats","", getwd())
+
+#Read the data
+data <- read.csv(paste(project_path, "/cleaned_data/all_Set1_AllData.csv", sep = "")) 
+
+# Prepare all objects for the model
+
+Index <- !is.na(data$crisis_aware)
+y <- data$crisis_aware[Index]
+N <- length(y) # The number of observations
+
+IDuni <- as.factor(data$Uni[Index]) #list the UNI for each participant
+tmp <- sort(unique(IDuni)) #make a list of the unique UNIs
+
+ll <- vector(length=N)
+
+for (ii in 1:N){
+  index2 <- IDuni[ii]==tmp
+  ll[ii] <- which(index2 == TRUE) #mark which UNI per participant by factor and not the UNI name
+}
+
+L <- length(unique(ll)) # number of universities
+
+D <- ifelse(data$Current_Year=="Year 2",1,0)# mark student who is in the second year as 1
+D <- D[Index]
+D1 <- ifelse(data$timepoint == 2 ,1,0) # mark wave 2 (2021) as 1
+D1 <- D1[Index]
+D2 <- ifelse(data$timepoint == 3 ,1,0) # mark wave 3 (2022) as 1
+D2 <- D2[Index]
+
+# Estimate logistic multilevel model
+data2 <- list(N=N, L=L, y=y, ll=ll, D=D, D1=D1, D2=D2)
+warmup <- 5000
+niter <- 10000
+fit <- stan(file="STORM_logistic_fullmodel_allwaves.stan",data=data2, warmup=warmup,iter=niter,chains=4, cores=4, refresh=10)
+
+
+
+output_summary <- summary(fit)
+output_summary <- as.data.frame(output_summary[["summary"]])
+
+ParDraws <- extract(fit)
+
+```
+
+```{r Crisis Aware Result}
+
+print(fit)
+
+```
+  
+
+### Learnt about Open Science
+
+Bayesian Logistic regression for whether participants learnt about open science during their studies or not (yes/no). 
+The explainer variables are:  
+* Whether the participant was in their first or second year of study 
+* The year the survey was conducted - 2020, 2021 and 2022   
+  
+  
+```{r Set_1 OS_Learnt, include = FALSE}
+
+# Prepare all objects for the model
+
+Index <- !is.na(data$os_learnt)
+y <- data$os_learnt[Index]
+N <- length(y) # The number of observations
+
+IDuni <- as.factor(data$Uni[Index]) #list the UNI for each participant
+tmp <- sort(unique(IDuni)) #make a list of the unique UNIs
+
+ll <- vector(length=N)
+
+for (ii in 1:N){
+  index2 <- IDuni[ii]==tmp
+  ll[ii] <- which(index2 == TRUE) #mark which UNI per participant by factor and not the UNI name
+}
+
+L <- length(unique(ll)) # number of universities
+
+D <- ifelse(data$Current_Year=="Year 2",1,0)# mark student who is in the second year as 1
+D <- D[Index]
+D1 <- ifelse(data$timepoint == 2 ,1,0) # mark wave 2 (2021) as 1
+D1 <- D1[Index]
+D2 <- ifelse(data$timepoint == 3 ,1,0) # mark wave 3 (2022) as 1
+D2 <- D2[Index]
+
+# Estimate logistic multilevel model
+data2 <- list(N=N, L=L, y=y, ll=ll, D=D, D1=D1, D2=D2)
+warmup <- 5000
+niter <- 10000
+fit <- stan(file="STORM_logistic_fullmodel_allwaves.stan",data=data2, warmup=warmup,iter=niter,chains=4, cores=4, refresh=10)
+
+
+
+output_summary <- summary(fit)
+output_summary <- as.data.frame(output_summary[["summary"]])
+
+ParDraws <- extract(fit)
+
+```
+
+```{r OS_Learnt Result}
+
+print(fit)
+
+```
+
+
+### Can Explain Open Science
+
+Bayesian Logistic regression for whether participants can explain open science or not (yes/no). 
+The explainer variables are:  
+* Whether the participant was in their first or second year of study 
+* The year the survey was conducted - 2020, 2021 and 2022   
+  
+  
+```{r Set_1 OS_Explain, include = FALSE}
+
+# Prepare all objects for the model
+
+Index <- !is.na(data$os_explain)
+y <- data$os_explain[Index]
+N <- length(y) # The number of observations
+
+IDuni <- as.factor(data$Uni[Index]) #list the UNI for each participant
+tmp <- sort(unique(IDuni)) #make a list of the unique UNIs
+
+ll <- vector(length=N)
+
+for (ii in 1:N){
+  index2 <- IDuni[ii]==tmp
+  ll[ii] <- which(index2 == TRUE) #mark which UNI per participant by factor and not the UNI name
+}
+
+L <- length(unique(ll)) # number of universities
+
+D <- ifelse(data$Current_Year=="Year 2",1,0)# mark student who is in the second year as 1
+D <- D[Index]
+D1 <- ifelse(data$timepoint == 2 ,1,0) # mark wave 2 (2021) as 1
+D1 <- D1[Index]
+D2 <- ifelse(data$timepoint == 3 ,1,0) # mark wave 3 (2022) as 1
+D2 <- D2[Index]
+
+# Estimate logistic multilevel model
+data2 <- list(N=N, L=L, y=y, ll=ll, D=D, D1=D1, D2=D2)
+warmup <- 5000
+niter <- 10000
+fit <- stan(file="STORM_logistic_fullmodel_allwaves.stan",data=data2, warmup=warmup,iter=niter,chains=4, cores=4, refresh=10)
+
+
+
+output_summary <- summary(fit)
+output_summary <- as.data.frame(output_summary[["summary"]])
+
+ParDraws <- extract(fit)
+
+```
+
+```{r OS_Explain Result}
+
+print(fit)
+
+```
+### Applicability  
+
+Bayesian Logistic regression for whether participants think that the issues discussed in the questionnaire are relevant to them (yes/no). 
+The explainer variables are: 
+* Whether the participant was in their first or second year of study 
+* The year the survey was conducted - 2020, 2021 and 2022   
+  
+  
+```{r Set_1 applicability, include = FALSE}
+
+# Prepare all objects for the model
+
+Index <- !is.na(data$applicability)
+y <- data$applicability[Index]
+N <- length(y) # The number of observations
+
+IDuni <- as.factor(data$Uni[Index]) #list the UNI for each participant
+tmp <- sort(unique(IDuni)) #make a list of the unique UNIs
+
+ll <- vector(length=N)
+
+for (ii in 1:N){
+  index2 <- IDuni[ii]==tmp
+  ll[ii] <- which(index2 == TRUE) #mark which UNI per participant by factor and not the UNI name
+}
+
+L <- length(unique(ll)) # number of universities
+
+D <- ifelse(data$Current_Year=="Year 2",1,0)# mark student who is in the second year as 1
+D <- D[Index]
+D1 <- ifelse(data$timepoint == 2 ,1,0) # mark wave 2 (2021) as 1
+D1 <- D1[Index]
+D2 <- ifelse(data$timepoint == 3 ,1,0) # mark wave 3 (2022) as 1
+D2 <- D2[Index]
+
+# Estimate logistic multilevel model
+data2 <- list(N=N, L=L, y=y, ll=ll, D=D, D1=D1, D2=D2)
+warmup <- 5000
+niter <- 10000
+fit <- stan(file="STORM_logistic_fullmodel_allwaves.stan",data=data2, warmup=warmup,iter=niter,chains=4, cores=4, refresh=10)
+
+
+
+output_summary <- summary(fit)
+output_summary <- as.data.frame(output_summary[["summary"]])
+
+ParDraws <- extract(fit)
+
+```
+
+```{r applicability Result}
+
+print(fit)
+
+```
+
+
+
 
 
 ## Data Set 2 - Truncated Poisson Regression  
@@ -64,8 +301,8 @@ D2 <- ifelse(data$timepoint == 3 ,1,0) # mark wave 3 (2022) as 1
 
 # Estimate logistic multilevel model
 data2 <- list(N=N, L=L, y=y, ll=ll, D=D, D1=D1, D2=D2)
-warmup <- 500
-niter <- 1000
+warmup <- 5000
+niter <- 10000
 fit <- stan(file="STORM_truncPoisson_allwaves.stan",data=data2, warmup=warmup,iter=niter,chains=4, cores=4, refresh=10)
 
 
@@ -156,8 +393,8 @@ D2 <- ifelse(data$timepoint == 3 ,1,0) # mark wave 3 (2022) as 1
 
 # Estimate logistic multilevel model
 data2 <- list(N=N, L=L, y=y, ll=ll, D=D, D1=D1, D2=D2)
-warmup <- 500
-niter <- 1000
+warmup <- 5000
+niter <- 10000
 fit <- stan(file="STORM_truncPoisson_allwaves.stan",data=data2, warmup=warmup,iter=niter,chains=4, cores=4, refresh=10)
 
 
@@ -253,8 +490,8 @@ D2 <- ifelse(data$timepoint == 3 ,1,0) # mark wave 3 (2022) as 1
 
 # Estimate logistic multilevel model
 data2 <- list(N=N, L=L, y=y, ll=ll, D=D, D1=D1, D2=D2)
-warmup <- 500
-niter <- 1000
+warmup <- 5000
+niter <- 10000
 fit <- stan(file="STORM_truncRegr_allwaves.stan",data=data2, warmup=warmup,iter=niter,chains=4, cores=4, refresh=10)
 
 
@@ -333,8 +570,8 @@ D2 <- ifelse(data$timepoint == 3 ,1,0) # mark wave 3 (2022) as 1
 
 # Estimate logistic multilevel model
 data2 <- list(N=N, L=L, y=y, ll=ll, D=D, D1=D1, D2=D2)
-warmup <- 500
-niter <- 1000
+warmup <- 5000
+niter <- 10000
 fit <- stan(file="STORM_truncRegr_allwaves.stan",data=data2, warmup=warmup,iter=niter,chains=4, cores=4, refresh=10)
 
 

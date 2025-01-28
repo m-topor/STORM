@@ -1850,7 +1850,7 @@ experience_plot + ggtitle("Expected Value for the Eperience with OS Practices") 
 
 ### Conceptual Perception Score  
 
-Bayesian regression for how positive are students perceptions of open and reproducible research. The scores are between -2 and 2 but will be changed by adding 2.001. This way the scale will be from 0 to 4.  
+Bayesian regression for how positive are students perceptions of open and reproducible research.    
 The explainer variables are:  
 * Whether the participant was at a university that was affiliated with the UKRN  
 * Whether the participant was in their first, second, placement or third year  
@@ -2192,7 +2192,7 @@ concept_plot + ggtitle("Expected Value for positive Conceptual Perceptions of OS
 
 ### Situational Perception Score  
 
-Bayesian regression for how positive are students perceptions of open and reproducible research. The scores are between -2 and 2 but will be changed by adding 2.001. This way the scale will be from 0 to 4.  
+Bayesian regression for how positive are students perceptions of open and reproducible research.    
 The explainer variables are:  
 * Whether the participant was at a university that was affiliated with the UKRN  
 * Whether the participant was in their first, second, placement or third year   

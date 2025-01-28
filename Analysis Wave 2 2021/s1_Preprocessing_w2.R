@@ -121,7 +121,7 @@ table(df_incl_cri_met$Gender)
 #Filter out the odd answers
 df_incl_cri_met <- df_incl_cri_met %>% 
   filter(!str_detect(Gender, "18|AFAB|x"))
-#2 cases were removed, total 757
+#3 cases were removed, total 757
 
 
 #I also checked the last comment question for duplicates - there were none, and screened
