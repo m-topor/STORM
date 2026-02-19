@@ -9,9 +9,9 @@ Data were collected in three waves - 2020, 2021 and 2022.
   
 Data were analysed with the consideration of whether the students' university was part of the UKRN and which year of study the students were in.  
   
-Project's OSF page:
-Project pre-print:  
-Published article:  
+Project's OSF page:  
+Project pre-print:    
+Published article:    
   
 ## Details about data and analyses  
 
