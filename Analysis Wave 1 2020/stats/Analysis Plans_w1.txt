@@ -1,5 +1,9 @@
 Analysis Plans 
 
+The analyses are divided in three sets. All analyses are included in one .Rmd file - Wave1_Analyses.Rmd
+Analysis output and all results with a description can be found in Wave1_Analyses.pdf 
+The analyses were successfully reproduced on a second Windows computer on 19/02/2026 by Marta Topor.
+
 ----------------------Set 1 _ AllData 
 -----From this dataset, the Binary Categorical outcomes will be included in the model. Here, [crisis explain] and [crisis learnt] will not be inlcuded in statistical models because there are too many missing responses. They will only be described qualitatively.
 
@@ -14,12 +18,10 @@ The UKRN variable will be a dummy variable with with two levels - 1 and 0
 
 -------MODEL 1---------------
 APPLIED TO:
-[crisis_aware] - logistic regression with both random effects for universities and clusters
-[os_learnt] - logistic regression with both random effects for universities and clusters
-[os_explain] - logistic regression with both random effects for universities and clusters
-[applicability] - logistic regression with both random effects for universities and clusters
-
-
+[crisis_aware] - logistic regression controlled for clustering of universities
+[os_learnt] - logistic regression controlled for clustering of universities
+[os_explain] - logistic regression controlled for clustering of universities
+[applicability] - logistic regression controlled for clustering of universities
 
 
 
@@ -40,10 +42,8 @@ The UKRN variable will be a dummy variable with with two levels - 1 and 0
 
 -------MODEL 2---------------
 APPLIED TO:
-[Awareness_Score_Total] - this is a count variable between 0 and 8 - truncated Poisson regression with random effects for universities and clusters
-[Experience_Score_Total] - this is a count variable between 0 and 8 - truncated Poisson regression with random effects for universities and clusters
-
-
+[Awareness_Score_Total] - this is a count variable between 0 and 8 - truncated Poisson regression controlled for clustering of universities
+[Experience_Score_Total] - this is a count variable between 0 and 8 - truncated Poisson regression controlled for clustering of universities
 
 
 ------- Next, we will address Conceptual Perception and Situational Perception. Both variables are mean values between -2 and 2 reflecting positive and negative perceptions of open science practices.
@@ -59,11 +59,23 @@ The UKRN variable will be a dummy variable with with two levels - 1 and 0
 
 -------MODEL 3---------------
 APPLIED TO:
-[Perception_Score_Mean] - this is the conceptual perception variable calculated as mean out of 16 items range -2 and 2 - truncated linear regression with random effects for universities and clusters
-[Knowledge_Score_Mean] - this is the situational perception variable calculated as mean out of 8 items range -2 and 2 - truncated linear regression with random effects for universities and clusters
+[Perception_Score_Mean] - this is the conceptual perception variable calculated as mean out of 16 items range -2 and 2 - truncated linear regression controlled for clustering of universities
+[Knowledge_Score_Mean] - this is the situational perception variable calculated as mean out of 8 items range -2 and 2 - truncated linear regression controlled for clustering of universities
 
 
 
+----------------------Set 3: Awareness, Experience ------------------
+-----For Set 3 - there are two data files: Awareness, Experience
+ 
 
+--------First, we will address Awareness
+
+(1)
+Which of the 8 open science practices had the highest probability of being selected as 'yes' among all of the respondents?
+
+------MODEL 4---------------
+The beta-bernoulli distribution was used to model the probability of selecting 'yes' and not 'no' in response to the 8 types of open science practices in relation to one another to see if there was one open science practice that was the most likely to have the 'yes' answer selected. 
+
+The probability was plotted and a table indicated the proportion of time each open science practice was more likely to have selected 'yes' rather than 'no' in comparison to all other open science practices.
 
  

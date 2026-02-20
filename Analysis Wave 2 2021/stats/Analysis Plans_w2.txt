@@ -1,5 +1,9 @@
 Analysis Plans 
 
+The analyses are divided in three sets. All analyses are included in one .Rmd file - Wave2_Analyses.Rmd
+Analysis output and all results with a description can be found in Wave1_Analyses.pdf 
+The analyses were successfully reproduced on a second Windows computer on 20/02/2026 by Marta Topor.
+
 ----------------------Set 1 _ AllData 
 -----From this dataset, the Binary Categorical outcomes will be included in the model. Here, [crisis explain] and [crisis learnt] will not be inlcuded in statistical models because there are too many missing responses. They will only be described qualitatively.
 
@@ -18,8 +22,6 @@ APPLIED TO:
 [os_learnt] - logistic regression with both random effects for universities and clusters
 [os_explain] - logistic regression with both random effects for universities and clusters
 [applicability] - logistic regression with both random effects for universities and clusters
-
-
 
 
 
@@ -64,6 +66,20 @@ APPLIED TO:
 
 
 
+----------------------Set 3: Awareness, Experience ------------------
+-----For Set 3 - there are two data files: Awareness, Experience
+ 
+
+--------First, we will address Awareness
+
+(1)
+Which of the 8 open science practices had the highest probability of being selected as 'yes' among all of the respondents?
+
+
+------MODEL 4---------------
+The beta-bernoulli distribution was used to model the probability of selecting 'yes' and not 'no' in response to the 8 types of open science practices in relation to one another to see if there was one open science practice that was the most likely to have the 'yes' answer selected. 
+
+The probability was plotted and a table indicated the proportion of time each open science practice was more likely to have selected 'yes' rather than 'no' in comparison to all other open science practices.
 
 
  

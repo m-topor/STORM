@@ -1,0 +1,665 @@
+---
+title: "STORM figures"
+author: "Priya Silverstein"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load data and libraries
+
+```{r}
+
+# removes everything from Environment
+rm(list=ls())
+
+# install.packages("tidyverse")
+library(tidyverse)
+library(ggplot2)
+library(ggdist)
+library(ggbeeswarm)
+library(ggforce)
+
+# session -> set working directory -> to source file location
+
+# load files
+
+wave1 <- read.csv("W1_final_wave1.csv")
+wave2 <- read.csv("W2_final_wave2.csv")
+wave3 <- read.csv("W3_final_wave3.csv")
+
+# drop gender (different type of variable for different waves, if we need it can come back and deal with it)
+wave1$Gender <- NULL
+wave2$Gender <- NULL
+wave3$Gender <- NULL
+
+# merge
+allwaves <-bind_rows(wave1, wave2, wave3)
+
+# fix year names
+allwaves <- allwaves %>%
+  mutate(Current_Year = as.factor(Current_Year),
+         Current_Year = fct_relevel(Current_Year, "Year 1", "Year 2", "Placement Year", "Final Year"),
+         timepoint = as.factor(timepoint))
+
+```
+
+1. Current Year Analyses
+
+1.1 Scale Scores
+
+1.1.1 Current_Year + Perception_Score_Total
+
+```{r}
+
+allwaves %>%
+  select(Current_Year, Perception_Score_Total) %>%
+  ggplot(aes(x = Current_Year, y = Perception_Score_Total)) +
+  stat_halfeye(
+    adjust = .5, 
+    width = .6, 
+    .width = 0, 
+    justification = -.3, 
+    point_colour = NA) + 
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Perception Score Total",
+       x = "")
+
+```
+
+1.1.2 Current_Year + Perception_Score_Mean
+
+```{r}
+
+allwaves %>%
+  select(Current_Year, Perception_Score_Mean) %>%
+  ggplot(aes(x = Current_Year, y = Perception_Score_Mean)) +
+  stat_halfeye(
+    adjust = .5, 
+    width = .6, 
+    .width = 0, 
+    justification = -.3, 
+    point_colour = NA) + 
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Perception Score Mean",
+       x = "")
+
+```
+
+1.1.3 Current_Year + Knowledge_Score_Total
+
+```{r}
+
+allwaves %>%
+  select(Current_Year, Knowledge_Score_Total) %>%
+  ggplot(aes(x = Current_Year, y = Knowledge_Score_Total)) +
+  stat_halfeye(
+    adjust = .5, 
+    width = .6, 
+    .width = 0, 
+    justification = -.3, 
+    point_colour = NA) + 
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Knowledge Score Total",
+       x = "")
+
+```
+
+1.1.4 Current_Year + Knowledge_Score_Mean
+
+```{r}
+
+allwaves %>%
+  select(Current_Year, Knowledge_Score_Mean) %>%
+  ggplot(aes(x = Current_Year, y = Knowledge_Score_Mean)) +
+  stat_halfeye(
+    adjust = .5, 
+    width = .6, 
+    .width = 0, 
+    justification = -.3, 
+    point_colour = NA) + 
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Knowledge Score Mean",
+       x = "")
+
+```
+
+1.1.5 Current_Year + Awareness_Score_Total
+
+```{r}
+
+allwaves %>%
+  select(Current_Year, Awareness_Score_Total) %>%
+  ggplot(aes(x = Current_Year, y = Awareness_Score_Total)) +
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Awareness Score Total",
+       x = "")
+
+```
+
+1.1.6 Current_Year + Experience_Score_Total
+
+```{r}
+
+allwaves %>%
+  select(Current_Year, Experience_Score_Total) %>%
+  ggplot(aes(x = Current_Year, y = Experience_Score_Total)) +
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Experience Score Total",
+       x = "")
+
+```
+
+1.2 Current Year Binary Categorical Variables
+
+
+```{r}
+
+
+allwaves %>%
+  select(Current_Year, crisis_aware, crisis_learnt, crisis_explain, os_explain, os_learnt, applicability) %>%
+  pivot_longer(cols = -Current_Year, 
+               names_to = "Item",
+               values_to = "Response") %>%
+  group_by(Current_Year) %>%
+  count(Item, Response) %>%
+  drop_na() %>%
+  group_by(Current_Year, Item) %>%
+  mutate(Response = as.factor(Response),
+         Proportion = round(100*prop.table(n)),
+         Item = str_replace(Item, "_", " "),
+         Item = str_to_title(Item),
+         Item = str_replace(Item, "Os", "OS"),
+         Item = fct_expand(Item, "Applicability"),
+         Item = fct_relevel(Item, "Applicability", after = Inf),
+         Response = case_match(Response, "0" ~ "No", "1" ~ "Yes", .default = Response)) %>%
+  ungroup() %>%
+  ggplot(aes(y = fct_rev(Current_Year), x = Proportion, fill = fct_rev(Response))) +
+  facet_wrap(~Item) +
+  geom_col(position = "stack") +
+  scale_fill_manual(values = c("#03bfc4", "#F8766D")) +
+  guides(fill = guide_legend(title = "Response")) +
+  ylab("")
+  
+  
+```
+2. UKRN Analyses
+
+2.1 Scale Scores
+
+2.1.1 UKRN + Perception_Score_Total
+
+```{r}
+
+allwaves %>%
+  select(UKRN, Perception_Score_Total) %>%
+  ggplot(aes(x = UKRN, y = Perception_Score_Total)) +
+  stat_halfeye(
+    adjust = .5, 
+    width = .6, 
+    .width = 0, 
+    justification = -.3, 
+    point_colour = NA) + 
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Perception Score Total",
+       x = "")
+
+```
+
+2.1.2 UKRN + Perception_Score_Mean
+
+```{r}
+
+allwaves %>%
+  select(UKRN, Perception_Score_Mean) %>%
+  ggplot(aes(x = UKRN, y = Perception_Score_Mean)) +
+  stat_halfeye(
+    adjust = .5, 
+    width = .6, 
+    .width = 0, 
+    justification = -.3, 
+    point_colour = NA) + 
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Perception Score Mean",
+       x = "")
+
+```
+
+2.1.3 UKRN + Knowledge_Score_Total
+
+```{r}
+
+allwaves %>%
+  select(UKRN, Knowledge_Score_Total) %>%
+  ggplot(aes(x = UKRN, y = Knowledge_Score_Total)) +
+  stat_halfeye(
+    adjust = .5, 
+    width = .6, 
+    .width = 0, 
+    justification = -.3, 
+    point_colour = NA) + 
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Knowledge Score Total",
+       x = "")
+
+```
+
+2.1.4 UKRN + Knowledge_Score_Mean
+
+```{r}
+
+allwaves %>%
+  select(UKRN, Knowledge_Score_Mean) %>%
+  ggplot(aes(x = UKRN, y = Knowledge_Score_Mean)) +
+  stat_halfeye(
+    adjust = .5, 
+    width = .6, 
+    .width = 0, 
+    justification = -.3, 
+    point_colour = NA) + 
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Knowledge Score Mean",
+       x = "")
+
+```
+
+2.1.5 UKRN + Awareness_Score_Total
+
+```{r}
+
+allwaves %>%
+  select(UKRN, Awareness_Score_Total) %>%
+  ggplot(aes(x = UKRN, y = Awareness_Score_Total)) +
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Awareness Score Total",
+       x = "")
+
+```
+
+2.1.6 UKRN + Experience_Score_Total
+
+```{r}
+
+allwaves %>%
+  select(UKRN, Experience_Score_Total) %>%
+  ggplot(aes(x = UKRN, y = Experience_Score_Total)) +
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Experience Score Total",
+       x = "")
+
+```
+
+2.2 UKRN Binary Categorical Variables
+
+
+```{r}
+
+
+allwaves %>%
+  select(UKRN, crisis_aware, crisis_learnt, crisis_explain, os_explain, os_learnt, applicability) %>%
+  pivot_longer(cols = -UKRN, 
+               names_to = "Item",
+               values_to = "Response") %>%
+  group_by(UKRN) %>%
+  count(Item, Response) %>%
+  drop_na() %>%
+  group_by(UKRN, Item) %>%
+  mutate(Response = as.factor(Response),
+         Proportion = round(100*prop.table(n)),
+         Item = str_replace(Item, "_", " "),
+         Item = str_to_title(Item),
+         Item = str_replace(Item, "Os", "OS"),
+         Item = fct_expand(Item, "Applicability"),
+         Item = fct_relevel(Item, "Applicability", after = Inf),
+         Response = case_match(Response, "0" ~ "No", "1" ~ "Yes", .default = Response)) %>%
+  ungroup() %>%
+  ggplot(aes(y = fct_rev(UKRN), x = Proportion, fill = fct_rev(Response))) +
+  facet_wrap(~Item) +
+  geom_col(position = "stack") +
+  scale_fill_manual(values = c("#03bfc4", "#F8766D")) +
+  guides(fill = guide_legend(title = "Response")) +
+  ylab("")
+  
+  
+```
+3. Timepoint Analyses
+
+3.1 Scale Scores
+
+3.1.1 Timepoint + Perception_Score_Total
+
+```{r}
+
+allwaves %>%
+  select(timepoint, Perception_Score_Total) %>%
+  ggplot(aes(x = timepoint, y = Perception_Score_Total)) +
+  stat_halfeye(
+    adjust = .5, 
+    width = .6, 
+    .width = 0, 
+    justification = -.3, 
+    point_colour = NA) + 
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Perception Score Total",
+       x = "Wave")
+
+```
+
+3.1.2 Timepoint + Perception_Score_Mean
+
+```{r}
+
+allwaves %>%
+  select(timepoint, Perception_Score_Mean) %>%
+  ggplot(aes(x = timepoint, y = Perception_Score_Mean)) +
+  stat_halfeye(
+    adjust = .5, 
+    width = .6, 
+    .width = 0, 
+    justification = -.3, 
+    point_colour = NA) + 
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Perception Score Mean",
+       x = "Wave")
+
+```
+
+3.1.3 Timepoint + Knowledge_Score_Total
+
+```{r}
+
+allwaves %>%
+  select(timepoint, Knowledge_Score_Total) %>%
+  ggplot(aes(x = timepoint, y = Knowledge_Score_Total)) +
+  stat_halfeye(
+    adjust = .5, 
+    width = .6, 
+    .width = 0, 
+    justification = -.3, 
+    point_colour = NA) + 
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Knowledge Score Total",
+       x = "Wave")
+
+```
+
+3.1.4 Timepoint + Knowledge_Score_Mean
+
+```{r}
+
+allwaves %>%
+  select(timepoint, Knowledge_Score_Mean) %>%
+  ggplot(aes(x = timepoint, y = Knowledge_Score_Mean)) +
+  stat_halfeye(
+    adjust = .5, 
+    width = .6, 
+    .width = 0, 
+    justification = -.3, 
+    point_colour = NA) + 
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Knowledge Score Mean",
+       x = "Wave")
+
+```
+
+3.1.5 Timepoint + Awareness_Score_Total
+
+```{r}
+
+allwaves %>%
+  select(timepoint, Awareness_Score_Total) %>%
+  ggplot(aes(x = timepoint, y = Awareness_Score_Total)) +
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Awareness Score Total",
+       x = "Wave")
+
+```
+NOTE: is there something wrong with the Wave 3 data here that all are 8 or NA?
+
+3.1.6 Timepoint + Experience_Score_Total
+
+```{r}
+
+allwaves %>%
+  select(timepoint, Experience_Score_Total) %>%
+  ggplot(aes(x = timepoint, y = Experience_Score_Total)) +
+  geom_boxplot(
+    width = .25, 
+    outlier.shape = NA
+  ) +
+  geom_point(
+    size = 1.5,
+    alpha = .2,
+    position = position_jitter(
+      seed = 1, width = .1
+    )
+  ) +
+  theme_light() +
+  labs(y = "Experience Score Total",
+       x = "Wave")
+
+```
+
+3.2 Timepoint Binary Categorical Variables
+
+
+```{r}
+
+
+allwaves %>%
+  select(timepoint, crisis_aware, crisis_learnt, crisis_explain, os_explain, os_learnt, applicability) %>%
+  pivot_longer(cols = -timepoint, 
+               names_to = "Item",
+               values_to = "Response") %>%
+  group_by(timepoint) %>%
+  count(Item, Response) %>%
+  drop_na() %>%
+  group_by(timepoint, Item) %>%
+  mutate(Response = as.factor(Response),
+         Proportion = round(100*prop.table(n)),
+         Item = str_replace(Item, "_", " "),
+         Item = str_to_title(Item),
+         Item = str_replace(Item, "Os", "OS"),
+         Item = fct_expand(Item, "Applicability"),
+         Item = fct_relevel(Item, "Applicability", after = Inf),
+         Response = case_match(Response, "0" ~ "No", "1" ~ "Yes", .default = Response)) %>%
+  ungroup() %>%
+  ggplot(aes(y = fct_rev(timepoint), x = Proportion, fill = fct_rev(Response))) +
+  facet_wrap(~Item) +
+  geom_col(position = "stack") +
+  scale_fill_manual(values = c("#03bfc4", "#F8766D")) +
+  guides(fill = guide_legend(title = "Response")) +
+  ylab("")
+  
+  
+```

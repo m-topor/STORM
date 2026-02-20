@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
 library(rstan) 
 library(ggplot2) 
+set.seed(123)
 ```
 
 # Hierarchical Bayesian Models Wave 1  
@@ -948,19 +949,12 @@ print(fit)
 **Year 4 N** = `r length(data$Current_Year[data$Current_Year == 'Final Year']) - sum(is.na(data$applicability[data$Current_Year == 'Final Year']))`  
   
   
-The output shows that beta credibility intervals do not cross 0 for the UKRN status and the interaction term.   
-UKRN Status   
-2.5% = `r output_summary['beta1','2.5%'] `   
-97.5% = `r output_summary['beta1','97.5%'] `   
-  
-  
-Interaction term:  
+The output shows that beta credibility intervals do not cross 0 the interaction term.   
+
 2.5% = `r output_summary['beta3','2.5%'] `   
 97.5% = `r output_summary['beta3','97.5%'] `  
   
-The interpretation for the UKRN term, is that students who were in non-UKRN universities were more likely to think that the issues covered in the questionnaire were relevant to them.  
-
-The interpretation for the interaction term is that students who attend a UKRN affiliated university are more likely to think that the issues around open and reproducible research are applicable to their work in the later years of education.
+The interpretation is that students who attend a UKRN affiliated university are more likely to think that the issues around open and reproducible research are applicable to their work in the later years of education.
   
 
 ```{r Set_1 Applicability effect, include = FALSE} 

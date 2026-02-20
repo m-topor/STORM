@@ -5,8 +5,8 @@ The raw data will not be explained in this meta-data document. The s1_Preprocess
 
 Raw data: "STORM_Project_anonymised.csv" &  "crisis_explain_wave_1.csv"
 
-Final Processed data: "final_wave1.csv"
-Note: The final_wave1_extended.csv has more extended data with additional columns extracted from the raw file, which were deemed unnecessary for the current analyses.
+Final Processed data: "W1_final_wave1.csv"
+Note: The W1_final_wave1_extended.csv has more extended data with additional columns extracted from the raw file, which were deemed unnecessary for the current analyses.
 
 
 -----------------final_wave1.csv--------------------------
