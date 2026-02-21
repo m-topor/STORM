@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
 library(rstan)
 library(ggplot2)
+set.seed(123)
 ```
 
 # Hierarchical Bayesian Models Wave 3
@@ -17,8 +18,7 @@ library(ggplot2)
 This document runs the models used to analyse the main outcomes for Wave 3.   
 The structure of the document follows the Analysis_Plans.txt file.   
 The variables in the datasets are explained in Meta-Data.txt.  
-<!-- ADD DETAILS The STAN files with the model formulas are...--> 
-  
+
 
 ## Data Set 1 - Binary Categorical Outcomes
   
@@ -386,10 +386,6 @@ print(fit)
   
   
 \textcolor{red}{ There were no errors here but the models took a long time to process and the result shows high Rhat values. The results also look quite strange with very large values for Beta 1 and Beta 2. There are conflicting findings in the output }
-
-The output shows that beta credibility intervals do not cross 0 for Beta 1 but in the negative direction. This seems to suggest that likelihood of learning about open science is larger in universities that are part of the UKRN.  
-2.5% = `r output_summary['beta2','2.5%'] `  
-97.5% = `r output_summary['beta2','97.5%'] ` 
 
 The output shows that beta credibility intervals do not cross 0 for Beta 2 but in the negative direction. This seems to suggest that likelihood of learning about open science is larger in earlier years of education at university  
 2.5% = `r output_summary['beta2','2.5%'] `  

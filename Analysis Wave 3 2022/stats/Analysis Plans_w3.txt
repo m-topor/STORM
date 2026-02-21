@@ -1,8 +1,8 @@
 Analysis Plans 
 
-The analyses are divided in three sets. All analyses are included in one .Rmd file - Wave2_Analyses.Rmd
-Analysis output and all results with a description can be found in Wave2_Analyses.pdf 
-The analyses were successfully reproduced on a second Windows computer on 20/02/2026 by Marta Topor.
+The analyses are divided in three sets. All analyses are included in one .Rmd file - Wave3_Analyses.Rmd
+Analysis output and all results with a description can be found in Wave3_Analyses.pdf 
+The analyses were successfully reproduced on a second Windows computer on 21/02/2026 by Marta Topor.
 
 ----------------------Set 1 _ AllData 
 -----From this dataset, the Binary Categorical outcomes will be included in the model. Here, [crisis explain] and [crisis learnt] will not be inlcuded in statistical models because there are too many missing responses. They will only be described qualitatively.

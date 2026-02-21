@@ -34,7 +34,21 @@ Below is a list of differences between waves 1, 2 and 3
 1. During Wave 2, participants also answered some additional questionnaires that were part of separate analyses - link to the paper:  
 As a result, the structure of the file is slightly different. Age was collected from participants at Wave 2 but not at Wave 1.   
   
-2. The raw data file downloaded for Wave 3 has some empty columns and some columns are already transformed into numbers. The Gender column is categorised as 1 = male, 2 = female, 3 = non-binary and 4 = other. All variables of interest already have numerical values and they are recoded in the preprocessing script to ensure that they are consistent with the other two waves. The columns full time/part time study, PTY for professional training year, Course_Duration and Previous_Training are epmty as the data were not collected. In waves 1 and 2 we filtered out participants who were not full time students. For this wave, this is not possible.
+2. The raw data file downloaded for Wave 3 has some empty columns and some columns are already transformed into numbers. The Gender column is categorised as 1 = male, 2 = female, 3 = non-binary and 4 = other. All variables of interest already have numerical values and they are recoded in the preprocessing script to ensure that they are consistent with the other two waves. The columns full time/part time study, PTY for professional training year, Course_Duration and Previous_Training are epmty as the data were not collected. In waves 1 and 2 we filtered out participants who were not full time students. For this wave, this is not possible.  
+  
+### To reproduce the results.  
+The data were analysed on a Windows computer and the analyses have not been tested on a Mac to date.  
+Preparations:  
+* RStudio   
+* The scripts are written in RMarkdown, if you have not used markdown in R before, you will need to install packages: rmarkdown and knitr. Separately to RStudio, you should also install MikTex. MikTex is needed to save the output as a PDF. An alterntive solution is to change the output format to html (the first few lines of the code). Then MikTex will not be needed.    
+* Install the rstan package  
+* Install the ggplot2 package  
+
+Clone the repository to your computer and open the R project.   
+  
+The folders are divided by Waves. Within each folder, you will find a preprocessing script and raw data. The data are already preprocessed and the clean data can be found in the cleaned_data folder. You don't need to do anything with those. For the main results, go into the stats folder and run the .Rmd file.  
+  
+Note that each script takes a long time to run and the time might differ for different machines. For a not very fancy Windows laptop, it's ~2h per script.  
   
 
   

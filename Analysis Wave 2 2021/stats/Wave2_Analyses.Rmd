@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
 library(rstan)
 library(ggplot2)
+set.seed(123)
 ```
 
 # Hierarchical Bayesian Models Wave 2
@@ -17,8 +18,7 @@ library(ggplot2)
 This document runs the models used to analyse the main outcomes for Wave 2.   
 The structure of the document follows the Analysis_Plans.txt file.   
 The variables in the datasets are explained in Meta-Data.txt.  
-<!-- ADD DETAILS The STAN files with the model formulas are...--> 
-  
+
 
 ## Data Set 1 - Binary Categorical Outcomes
   
