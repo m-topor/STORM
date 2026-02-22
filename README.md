@@ -48,7 +48,7 @@ Clone the repository to your computer and open the R project.
   
 The folders are divided by Waves. Within each folder, you will find a preprocessing script and raw data. The data are already preprocessed and the clean data can be found in the cleaned_data folder. You don't need to do anything with those. For the main results, go into the stats folder and run the .Rmd file.  
   
-Note that each script takes a long time to run and the time might differ for different machines. For a not very fancy Windows laptop, it's ~2h per script.  
+Note that each script takes a long time to run and the time might differ for different machines. For a not very fancy Windows laptop, it's ~2h per script (~4h for Wave 3).  
   
 
   

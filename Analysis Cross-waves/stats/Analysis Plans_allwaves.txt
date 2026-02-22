@@ -1,16 +1,19 @@
 Analysis Plans 
 
+The analyses are divided in three sets. All analyses are included in one .Rmd file - AllWaves_Analyses.Rmd
+Analysis output and all results with a description can be found in AllWaves_Analyses.pdf 
+The analyses were successfully reproduced on a second Windows computer on 21/02/2026 by Marta Topor.
+
 ----------------------Set 1 _ AllData 
 -----From this dataset, the Binary Categorical outcomes will be included in the model. Here, [crisis explain] and [crisis learnt] will not be inlcuded in statistical models because there are too many missing responses. They will only be described qualitatively.
 
 (1)
-Is there a difference in probability for Yes (1) or No (0) on the variables listed below, based on whether the University is part of the UKRN or not - [UKRN] variable with two categorical levels 
+Is there a difference in probability for Yes (1) or No (0) on the variables listed below, based on the students' year of study [Current_Year] numerical variable with two levels [1] = Year 1 [2] = Year 2
 (2)
-and based on the students' year of study [Current_Year] numerical variable with four levels [1] = Year 1 [2] = Year 2 [2.5] = Placement Year and [3] == Final Year
+and based on the wave year [timepoint] numerical variable with two levels [1] = Wave 1, [2] = Wave 2 and [3] = Wave 3
 
 ---> Must be controlled for clustering on the university level
----> These two questions will be answered in one model + there will be an addition of an interaction between [UKRN] and the [Current_Year] variables. 
-The UKRN variable will be a dummy variable with with two levels - 1 and 0
+
 
 -------MODEL 1---------------
 APPLIED TO:
@@ -30,13 +33,12 @@ APPLIED TO:
 --------First, we will address Awareness and Experience. Both variables are count variables on a scale of 0 to 8.
 
 (1)
-Is there a difference in the count of open science practices in the variables listed below, based on whether the University is part of the UKRN or not - [UKRN] variable with two categorical levels 
+Is there a difference in probability for Yes (1) or No (0) on the variables listed below, based on the students' year of study [Current_Year] numerical variable with two levels [1] = Year 1 [2] = Year 2
 (2)
-and based on the students' year of study [Current_Year] categorical variable with four levels "Year 1"/"Year 2"/"Placement Year"/"Final Year"
+and based on the wave year [timepoint] numerical variable with two levels [1] = Wave 1, [2] = Wave 2 and [3] = Wave 3
 
 ---> Must be controlled for clustering on the university level
----> These two questions will be answered in one model + there will be an addition of an interaction between [UKRN] and the [Current_Year] variables. 
-The UKRN variable will be a dummy variable with with two levels - 1 and 0
+
 
 -------MODEL 2---------------
 APPLIED TO:
@@ -49,13 +51,12 @@ APPLIED TO:
 ------- Next, we will address Conceptual Perception and Situational Perception. Both variables are mean values between -2 and 2 reflecting positive and negative perceptions of open science practices.
 
 (1)
-Is there a difference in the perception of open science practices in the variables listed below, based on whether the University is part of the UKRN or not - [UKRN] variable with two categorical levels 
+Is there a difference in probability for Yes (1) or No (0) on the variables listed below, based on the students' year of study [Current_Year] numerical variable with two levels [1] = Year 1 [2] = Year 2
 (2)
-and based on the students' year of study [Current_Year] categorical variable with four levels "Year 1"/"Year 2"/"Placement Year"/"Final Year"
+and based on the wave year [timepoint] numerical variable with two levels [1] = Wave 1, [2] = Wave 2 and [3] = Wave 3
 
 ---> Must be controlled for clustering on the university level
----> These two questions will be answered in one model + there will be an addition of an interaction between [UKRN] and the [Current_Year] variables. 
-The UKRN variable will be a dummy variable with with two levels - 1 and 0
+
 
 -------MODEL 3---------------
 APPLIED TO:
