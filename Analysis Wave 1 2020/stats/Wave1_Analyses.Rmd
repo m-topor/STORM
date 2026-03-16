@@ -2626,7 +2626,84 @@ probs_Awareness
 #Prob that pi_1 is the highest proportion of YES among categories
 ```
 
-`probs_Awareness` 
+`probs_Awareness`
+
+
+### For the least common category in the Awareness variable  
+  
+The categories are: * Replication * Open Research Materials * Open Educational
+Materials * Open Access Journals * Open Data * Power Analysis * Preregistration
+* Preprint  
+
+```{r probability least category}
+#---------------------------------------------------------
+#The highest number of NOs 
+
+highest_pi_1 <- matrix(0, 1e6, 1)
+highest_pi_2 <- matrix(0, 1e6, 1)
+highest_pi_3 <- matrix(0, 1e6, 1)
+highest_pi_4 <- matrix(0, 1e6, 1)
+highest_pi_5 <- matrix(0, 1e6, 1)
+highest_pi_6 <- matrix(0, 1e6, 1)
+highest_pi_7 <- matrix(0, 1e6, 1)
+highest_pi_8 <- matrix(0, 1e6, 1)
+
+for (jj in 1:1e6){ 
+  pi_1 <- rbeta(1, 1+no[1], 1+yes[1])
+  pi_2 <- rbeta(1, 1+no[2], 1+yes[2]) 
+  pi_3 <- rbeta(1, 1+no[3], 1+yes[3]) 
+  pi_4 <- rbeta(1, 1+no[4], 1+yes[4]) 
+  pi_5 <- rbeta(1, 1+no[5], 1+yes[5])
+  pi_6 <- rbeta(1, 1+no[6], 1+yes[6]) 
+  pi_7 <- rbeta(1, 1+no[7], 1+yes[7])
+  pi_8 <- rbeta(1, 1+no[8], 1+yes[8])
+                                                             
+if (pi_1 > pi_2 & pi_1 > pi_3 & pi_1 > pi_4 & pi_1 > pi_5 & pi_1 > pi_6 & pi_1 > pi_7 & pi_1 > pi_8) { 
+  highest_pi_1[jj] <- 1 }
+  
+if (pi_2 > pi_1 & pi_2 > pi_3 & pi_2 > pi_4 & pi_2 > pi_5 & pi_2 > pi_6 & pi_2 > pi_7 & pi_2 > pi_8) { 
+  highest_pi_2[jj] <- 1 }
+  
+if (pi_3 > pi_2 & pi_3 > pi_1 & pi_3 > pi_4 & pi_3 > pi_5 & pi_3 > pi_6 & pi_3 > pi_7 & pi_3 > pi_8) { 
+  highest_pi_3[jj] <- 1 }  
+  
+if (pi_4 > pi_2 & pi_4 > pi_3 & pi_4 > pi_1 & pi_4 > pi_5 & pi_4 > pi_6 & pi_4 > pi_7 & pi_4 > pi_8) { 
+  highest_pi_4[jj] <- 1 }
+ 
+if (pi_5 > pi_2 & pi_5 > pi_3 & pi_5 > pi_4 & pi_5 > pi_1 & pi_5 > pi_6 & pi_5 > pi_7 & pi_5 > pi_8) { 
+  highest_pi_5[jj] <- 1 } 
+
+if (pi_6 > pi_2 & pi_6 > pi_3 & pi_6 > pi_4 & pi_6 > pi_5 & pi_6 > pi_1 & pi_6 > pi_7 & pi_6 > pi_8) { 
+  highest_pi_1[jj] <- 1 }  
+  
+if (pi_7 > pi_2 & pi_7 > pi_3 & pi_7 > pi_4 & pi_7 > pi_5 & pi_7 > pi_6 & pi_7 > pi_1 & pi_7 > pi_8) { 
+  highest_pi_7[jj] <- 1 }
+  
+  if (pi_8 > pi_2 & pi_8 > pi_3 & pi_8 > pi_4 & pi_8 > pi_5 & pi_8 > pi_6 & pi_8 > pi_7 & pi_8 > pi_1) { 
+  highest_pi_8[jj] <- 1 }
+}
+
+probs_Awareness_no <- data.frame(row.names = c('Replication', 'Open Research Materials', 'Open Educational
+Materials', 'Open Access Journals', 'Open Data', 'Power Analysis', 'Preregistration', 'Preprint'))
+
+probs_Awareness_no$Probability <- 0
+
+
+probs_Awareness_no$Probability[1] <- mean(round(highest_pi_1, 2))
+probs_Awareness_no$Probability[2] <- mean(round(highest_pi_2, 2))
+probs_Awareness_no$Probability[3] <- mean(round(highest_pi_3, 2))
+probs_Awareness_no$Probability[4] <- mean(round(highest_pi_4, 2))
+probs_Awareness_no$Probability[5] <- mean(round(highest_pi_5, 2))
+probs_Awareness_no$Probability[6] <- mean(round(highest_pi_6, 2))
+probs_Awareness_no$Probability[7] <- mean(round(highest_pi_7, 2))
+probs_Awareness_no$Probability[8] <- mean(round(highest_pi_8, 2))
+
+probs_Awareness_no
+
+#Prob that pi_1 is the highest proportion of NOs among categories
+```
+
+`probs_Awareness_no` 
 
 
 
@@ -2738,3 +2815,158 @@ probs_Experience
 ```
 
 `probs_Experience` 
+
+### For the least common category in the Awareness variable  
+  
+The categories are: * Replication * Open Research Materials * Open Educational
+Materials * Open Access Journals * Open Data * Power Analysis * Preregistration
+* Preprint 
+
+```{r probs least common exp}
+
+highest_pi_1 <- matrix(0, 1e6, 1)
+highest_pi_2 <- matrix(0, 1e6, 1)
+highest_pi_3 <- matrix(0, 1e6, 1)
+highest_pi_4 <- matrix(0, 1e6, 1)
+highest_pi_5 <- matrix(0, 1e6, 1)
+highest_pi_6 <- matrix(0, 1e6, 1)
+highest_pi_7 <- matrix(0, 1e6, 1)
+highest_pi_8 <- matrix(0, 1e6, 1)
+
+for (jj in 1:1e6){ 
+  pi_1 <- rbeta(1, 1+no[1], 1+yes[1])
+  pi_2 <- rbeta(1, 1+no[2], 1+yes[2]) 
+  pi_3 <- rbeta(1, 1+no[3], 1+yes[3]) 
+  pi_4 <- rbeta(1, 1+no[4], 1+yes[4]) 
+  pi_5 <- rbeta(1, 1+no[5], 1+yes[5])
+  pi_6 <- rbeta(1, 1+no[6], 1+yes[6]) 
+  pi_7 <- rbeta(1, 1+no[7], 1+yes[7])
+  pi_8 <- rbeta(1, 1+no[8], 1+yes[8])
+                                                             
+if (pi_1 > pi_2 & pi_1 > pi_3 & pi_1 > pi_4 & pi_1 > pi_5 & pi_1 > pi_6 & pi_1 > pi_7 & pi_1 > pi_8) { 
+  highest_pi_1[jj] <- 1 }
+  
+if (pi_2 > pi_1 & pi_2 > pi_3 & pi_2 > pi_4 & pi_2 > pi_5 & pi_2 > pi_6 & pi_2 > pi_7 & pi_2 > pi_8) { 
+  highest_pi_2[jj] <- 1 }
+  
+if (pi_3 > pi_2 & pi_3 > pi_1 & pi_3 > pi_4 & pi_3 > pi_5 & pi_3 > pi_6 & pi_3 > pi_7 & pi_3 > pi_8) { 
+  highest_pi_3[jj] <- 1 }  
+  
+if (pi_4 > pi_2 & pi_4 > pi_3 & pi_4 > pi_1 & pi_4 > pi_5 & pi_4 > pi_6 & pi_4 > pi_7 & pi_4 > pi_8) { 
+  highest_pi_4[jj] <- 1 }
+ 
+if (pi_5 > pi_2 & pi_5 > pi_3 & pi_5 > pi_4 & pi_5 > pi_1 & pi_5 > pi_6 & pi_5 > pi_7 & pi_5 > pi_8) { 
+  highest_pi_5[jj] <- 1 } 
+
+if (pi_6 > pi_2 & pi_6 > pi_3 & pi_6 > pi_4 & pi_6 > pi_5 & pi_6 > pi_1 & pi_6 > pi_7 & pi_6 > pi_8) { 
+  highest_pi_1[jj] <- 1 }  
+  
+if (pi_7 > pi_2 & pi_7 > pi_3 & pi_7 > pi_4 & pi_7 > pi_5 & pi_7 > pi_6 & pi_7 > pi_1 & pi_7 > pi_8) { 
+  highest_pi_7[jj] <- 1 }
+  
+  if (pi_8 > pi_2 & pi_8 > pi_3 & pi_8 > pi_4 & pi_8 > pi_5 & pi_8 > pi_6 & pi_8 > pi_7 & pi_8 > pi_1) { 
+  highest_pi_8[jj] <- 1 }
+}
+
+probs_Experience_no <- data.frame(row.names = c('Replication', 'Open Research Materials', 'Open Educational
+Materials', 'Open Access Journals', 'Open Data', 'Power Analysis', 'Preregistration', 'Preprint'))
+
+probs_Experience_no$Probability <- 0
+
+
+probs_Experience_no$Probability[1] <- mean(round(highest_pi_1, 2))
+probs_Experience_no$Probability[2] <- mean(round(highest_pi_2, 2))
+probs_Experience_no$Probability[3] <- mean(round(highest_pi_3, 2))
+probs_Experience_no$Probability[4] <- mean(round(highest_pi_4, 2))
+probs_Experience_no$Probability[5] <- mean(round(highest_pi_5, 2))
+probs_Experience_no$Probability[6] <- mean(round(highest_pi_6, 2))
+probs_Experience_no$Probability[7] <- mean(round(highest_pi_7, 2))
+probs_Experience_no$Probability[8] <- mean(round(highest_pi_8, 2))
+
+probs_Experience_no
+
+```
+
+### Descriptives
+
+
+```{r descriptives}
+#Read the data 
+
+data <- read.csv(paste(project_path, "/cleaned_data/W1_Set1_AllData.csv", sep = ""))
+
+crisis_aware_w1y1 <- sum(data$crisis_aware[data$Current_Year == "Year 1"], na.rm = TRUE)
+crisis_aware_w1y2 <- sum(data$crisis_aware[data$Current_Year == "Year 2"], na.rm = TRUE)
+crisis_aware_w1py <- sum(data$crisis_aware[data$Current_Year == "Placement Year"], na.rm = TRUE)
+crisis_aware_w1y3 <- sum(data$crisis_aware[data$Current_Year == "Final Year"], na.rm = TRUE)
+crisis_aware <- c(crisis_aware_w1y1, crisis_aware_w1y2, crisis_aware_w1py, crisis_aware_w1y3)
+
+os_learnt_w1y1 <- sum(data$os_learnt[data$Current_Year == "Year 1"], na.rm = TRUE)
+os_learnt_w1y2 <- sum(data$os_learnt[data$Current_Year == "Year 2"], na.rm = TRUE)
+os_learnt_w1py <- sum(data$os_learnt[data$Current_Year == "Placement Year"], na.rm = TRUE)
+os_learnt_w1y3 <- sum(data$os_learnt[data$Current_Year == "Final Year"], na.rm = TRUE)
+os_learnt <- c(os_learnt_w1y1, os_learnt_w1y2, os_learnt_w1py, os_learnt_w1y3)
+
+os_explain_w1y1 <- sum(data$os_explain[data$Current_Year == "Year 1"], na.rm = TRUE)
+os_explain_w1y2 <- sum(data$os_explain[data$Current_Year == "Year 2"], na.rm = TRUE)
+os_explain_w1py <- sum(data$os_explain[data$Current_Year == "Placement Year"], na.rm = TRUE)
+os_explain_w1y3 <- sum(data$os_explain[data$Current_Year == "Final Year"], na.rm = TRUE)
+os_explain <- c(os_explain_w1y1, os_explain_w1y2, os_explain_w1py, os_explain_w1y3)
+
+applicability_w1y1 <- sum(data$applicability[data$Current_Year == "Year 1"], na.rm = TRUE)
+applicability_w1y2 <- sum(data$applicability[data$Current_Year == "Year 2"], na.rm = TRUE)
+applicability_w1py <- sum(data$applicability[data$Current_Year == "Placement Year"], na.rm = TRUE)
+applicability_w1y3 <- sum(data$applicability[data$Current_Year == "Final Year"], na.rm = TRUE)
+applicability <- c(applicability_w1y1, applicability_w1y2, applicability_w1py, applicability_w1y3)
+
+crisis_explain_w1y1 <- sum(data$crisis_explain[data$Current_Year == "Year 1"], na.rm = TRUE)
+crisis_explain_w1y2 <- sum(data$crisis_explain[data$Current_Year == "Year 2"], na.rm = TRUE)
+crisis_explain_w1py <- sum(data$crisis_explain[data$Current_Year == "Placement Year"], na.rm = TRUE)
+crisis_explain_w1y3 <- sum(data$crisis_explain[data$Current_Year == "Final Year"], na.rm = TRUE)
+crisis_explain <- c(crisis_explain_w1y1, crisis_explain_w1y2, crisis_explain_w1py, crisis_explain_w1y3)
+
+crisis_learnt_w1y1 <- sum(data$crisis_learnt[data$Current_Year == "Year 1"], na.rm = TRUE)
+crisis_learnt_w1y2 <- sum(data$crisis_learnt[data$Current_Year == "Year 2"], na.rm = TRUE)
+crisis_learnt_w1py <- sum(data$crisis_learnt[data$Current_Year == "Placement Year"], na.rm = TRUE)
+crisis_learnt_w1y3 <- sum(data$crisis_learnt[data$Current_Year == "Final Year"], na.rm = TRUE)
+crisis_learnt <- c(crisis_learnt_w1y1, crisis_learnt_w1y2, crisis_learnt_w1py, crisis_learnt_w1y3)
+
+
+data2 <- read.csv(paste(project_path, "/cleaned_data/W1_Set2_ConceptualPerception.csv", sep = "")) 
+data2$Perception_Score_Mean <- data2$Perception_Score_Total/16
+concept_w1y1 <- mean(data2$Perception_Score_Mean[data2$Current_Year == "Year 1"], na.rm = TRUE)
+concept_w1y2 <- mean(data2$Perception_Score_Mean[data2$Current_Year == "Year 2"], na.rm = TRUE)
+concept_w1py <- mean(data2$Perception_Score_Mean[data2$Current_Year == "Placement Year"], na.rm = TRUE)
+concept_w1y3 <- mean(data2$Perception_Score_Mean[data2$Current_Year == "Final Year"], na.rm = TRUE)
+concept <- c(concept_w1y1, concept_w1y2, concept_w1py, concept_w1y3)
+
+data3 <- read.csv(paste(project_path, "/cleaned_data/W1_Set2_SituationalPerception.csv", sep = "")) 
+data3$Knowledge_Score_Mean <- data3$Knowledge_Score_Total/8
+situational_w1y1 <- mean(data3$Knowledge_Score_Mean[data3$Current_Year == "Year 1"], na.rm = TRUE)
+situational_w1y2 <- mean(data3$Knowledge_Score_Mean[data3$Current_Year == "Year 2"], na.rm = TRUE)
+situational_w1py <- mean(data3$Knowledge_Score_Mean[data3$Current_Year == "Placement Year"], na.rm = TRUE)
+situational_w1y3 <- mean(data3$Knowledge_Score_Mean[data3$Current_Year == "Final Year"], na.rm = TRUE)
+situational <- c(situational_w1y1, situational_w1y2, situational_w1py, situational_w1y3)
+
+data4 <-  read.csv(paste(project_path, "/cleaned_data/W1_Set2_Awareness.csv", sep = "")) 
+awareness_w1y1 <- mean(data4$Awareness_Score_Total[data4$Current_Year == "Year 1"], na.rm = TRUE)
+awareness_w1y2 <- mean(data4$Awareness_Score_Total[data4$Current_Year == "Year 2"], na.rm = TRUE)
+awareness_w1py <- mean(data4$Awareness_Score_Total[data4$Current_Year == "Placement Year"], na.rm = TRUE)
+awareness_w1y3 <- mean(data4$Awareness_Score_Total[data4$Current_Year == "Final Year"], na.rm = TRUE)
+awareness <- c(awareness_w1y1, awareness_w1y2, awareness_w1py, awareness_w1y3)
+
+data5 <- read.csv(paste(project_path, "/cleaned_data/W1_Set2_Experience.csv", sep = "")) 
+experience_w1y1 <- mean(data5$Experience_Score_Total[data5$Current_Year == "Year 1"], na.rm = TRUE)
+experience_w1y2 <- mean(data5$Experience_Score_Total[data5$Current_Year == "Year 2"], na.rm = TRUE)
+experience_w1py <- mean(data5$Experience_Score_Total[data5$Current_Year == "Placement Year"], na.rm = TRUE)
+experience_w1y3 <- mean(data5$Experience_Score_Total[data5$Current_Year == "Final Year"], na.rm = TRUE)
+experience <- c(experience_w1y1, experience_w1y2, experience_w1py, experience_w1y3)
+
+descriptives <- as.data.frame(rbind(crisis_aware, os_learnt, os_explain, applicability, crisis_explain, crisis_learnt, concept, situational, awareness, experience))
+
+colnames(descriptives) <- c("Year1", "Year2", "Placement Year", "Year 3")
+
+View(descriptives)
+
+
+```
