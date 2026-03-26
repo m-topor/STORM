@@ -16,8 +16,8 @@ library(ggplot2)
 library(ltm)
 
 #Read in the file
-df_all_data <- read.csv('STORM_Project_2022_anonymised.csv')
-
+project_path <- gsub("STORM","STORM/Analysis Wave 3 2022", getwd())
+df_all_data <- read.csv(paste(project_path, "/STORM_Project_2022_anonymised.csv", sep = "")) 
 
 # DATA CLEANING ----
 
@@ -56,7 +56,7 @@ colnames(df_all_data) <- c('Progress', 'Duration_Seconds', 'Finished', 'Uni',	'F
 df_all_data$ID <- 1:length(df_all_data$Progress)
 
 
-crisis_explain <- read.csv('crisis_explain_wave_3.csv')
+crisis_explain <- read.csv(paste(project_path, "/crisis_explain_wave_3.csv", sep = "")) 
 #only keep the variables needed
 crisis_explain <- crisis_explain[,c(1:2, 7)]
 #rename
@@ -433,8 +433,7 @@ colnames(Set2_Experience) <- c("ID", "Uni", "Full_Part", "PTY", "Current_Year", 
 
 
 
-
-setwd("C:/Users/marto05/OneDrive - Linköpings universitet/10. Side projects/2. STORM/STORM/Analysis Wave 3 2022/cleaned_data")
+setwd(gsub("STORM","STORM/Analysis Wave 3 2022/cleaned_data", getwd()))
 write.csv(Set1_AllData, "W3_Set1_AllData.csv", row.names = FALSE)
 write.csv(Set2_ConceptualPerception, "W3_Set2_ConceptualPerception.csv", row.names = FALSE)
 write.csv(Set2_SituationalPerception, "W3_Set2_SituationalPerception.csv", row.names = FALSE)
@@ -445,18 +444,8 @@ write.csv(final_df, "W3_final_wave3.csv", row.names = FALSE)
 write.csv(final_df_all, "W3_final_wave3_extended.csv", row.names = FALSE)
 
 
-setwd("C:/Users/marto05/OneDrive - Linköpings universitet/10. Side projects/2. STORM/STORM/Analysis Wave 1 2020")
 
 
-#------------------------Cronbach's Alpha------------------------
-#Set1_ConceptualPerception
-#cronbach.alpha(Set2_ConceptualPerception[,12:28], na.rm=TRUE)
-#Set1_SituationalPerception 
-#cronbach.alpha(Set2_SituationalPerception[,12:19], na.rm=TRUE)
-#Set1_Awareness
-#cronbach.alpha(Set2_Awareness[,12:19], na.rm=TRUE)
-#Set1_Experience
-#cronbach.alpha(Set2_Experience[,12:19], na.rm=TRUE)
 
 
 

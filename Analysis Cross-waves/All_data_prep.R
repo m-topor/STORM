@@ -113,8 +113,7 @@ colnames(Set2_Experience) <- c("ID", "Uni", "Full_Part", "PTY", "Current_Year", 
 
 
 
-
-setwd("C:/Users/marto05/OneDrive - Linköpings universitet/10. Side projects/2. STORM/STORM/Analysis Cross-waves/cleaned_data")
+setwd(gsub("STORM","STORM//Analysis Cross-waves/cleaned_data", getwd()))
 write.csv(Set1_AllData, "all_Set1_AllData.csv", row.names = FALSE)
 write.csv(Set2_ConceptualPerception, "all_Set2_ConceptualPerception.csv", row.names = FALSE)
 write.csv(Set2_SituationalPerception, "all_Set2_SituationalPerception.csv", row.names = FALSE)
