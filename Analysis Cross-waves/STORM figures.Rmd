@@ -22,14 +22,17 @@ library(ggplot2)
 library(ggdist)
 library(ggbeeswarm)
 library(ggforce)
+library(patchwork)
 
 # session -> set working directory -> to source file location
 
 # load files
+root <- rprojroot::find_rstudio_root_file()
+setwd(root)
 
-wave1 <- read.csv("W1_final_wave1.csv")
-wave2 <- read.csv("W2_final_wave2.csv")
-wave3 <- read.csv("W3_final_wave3.csv")
+wave1 <- read.csv("Analysis Wave 1 2020/cleaned_data/W1_final_wave1.csv")
+wave2 <- read.csv("Analysis Wave 2 2021/cleaned_data/W2_final_wave2.csv")
+wave3 <- read.csv("Analysis Wave 3 2022/cleaned_data/W3_final_wave3.csv")
 
 # drop gender (different type of variable for different waves, if we need it can come back and deal with it)
 wave1$Gender <- NULL
@@ -584,10 +587,15 @@ allwaves %>%
 3.1.5 Timepoint + Awareness_Score_Total
 
 ```{r}
+allwaves <- allwaves %>%
+  mutate(timepoint = recode(timepoint, 
+                            '1' = "Wave 1",
+                            '2' = "Wave 2",
+                            '3' = "Wave 3"))
 
-allwaves %>%
+p1 <- allwaves %>%
   select(timepoint, Awareness_Score_Total) %>%
-  ggplot(aes(x = timepoint, y = Awareness_Score_Total)) +
+  ggplot(aes(x = timepoint, y = Awareness_Score_Total, colour = timepoint)) +
   geom_boxplot(
     width = .25, 
     outlier.shape = NA
@@ -600,8 +608,11 @@ allwaves %>%
     )
   ) +
   theme_light() +
+  theme(legend.position = "none") +
   labs(y = "Awareness Score Total",
-       x = "Wave")
+       x = element_blank())
+
+p1
 
 ```
 NOTE: is there something wrong with the Wave 3 data here that all are 8 or NA?
@@ -610,9 +621,9 @@ NOTE: is there something wrong with the Wave 3 data here that all are 8 or NA?
 
 ```{r}
 
-allwaves %>%
+p2 <- allwaves %>%
   select(timepoint, Experience_Score_Total) %>%
-  ggplot(aes(x = timepoint, y = Experience_Score_Total)) +
+  ggplot(aes(x = timepoint, y = Experience_Score_Total, colour = timepoint)) +
   geom_boxplot(
     width = .25, 
     outlier.shape = NA
@@ -625,8 +636,19 @@ allwaves %>%
     )
   ) +
   theme_light() +
+  theme(legend.position = "none") +
   labs(y = "Experience Score Total",
-       x = "Wave")
+       x = element_blank())
+
+p2
+
+```
+
+```{r}
+
+p1 + p2
+
+ggsave("Figure 4.png", width = 10,)
 
 ```
 
@@ -635,9 +657,8 @@ allwaves %>%
 
 ```{r}
 
-
 allwaves %>%
-  select(timepoint, crisis_aware, crisis_learnt, crisis_explain, os_explain, os_learnt, applicability) %>%
+  select(timepoint, crisis_aware, os_explain, os_learnt, applicability) %>%
   pivot_longer(cols = -timepoint, 
                names_to = "Item",
                values_to = "Response") %>%
@@ -647,9 +668,11 @@ allwaves %>%
   group_by(timepoint, Item) %>%
   mutate(Response = as.factor(Response),
          Proportion = round(100*prop.table(n)),
-         Item = str_replace(Item, "_", " "),
          Item = str_to_title(Item),
-         Item = str_replace(Item, "Os", "OS"),
+         Item = str_replace(Item, "Os_explain", "Can Explain Open Research"),
+         Item = str_replace(Item, "Os_learnt", "Learned About Open Research"),
+         Item = str_replace(Item, "Crisis_aware", "Crisis Awareness"),
+         Item = str_replace(Item, "Applicability", "Perceived Applicability"),
          Item = fct_expand(Item, "Applicability"),
          Item = fct_relevel(Item, "Applicability", after = Inf),
          Response = case_match(Response, "0" ~ "No", "1" ~ "Yes", .default = Response)) %>%
@@ -661,5 +684,7 @@ allwaves %>%
   guides(fill = guide_legend(title = "Response")) +
   ylab("")
   
+
+ggsave("Figure 3.png")
   
 ```
