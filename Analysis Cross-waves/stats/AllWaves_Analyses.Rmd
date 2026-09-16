@@ -8,7 +8,7 @@ date: January 2025
 ```{r setup, include=FALSE, echo = FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
-library(rstan)
+library(rstan) # version 2.26.23 and 2.26.28 for StanHeaders
 library(ggplot2)
 set.seed(123)
 ```
