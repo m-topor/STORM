@@ -460,7 +460,7 @@ allwaves %>%
   
   
 ```
-3. Timepoint Analyses
+3. Timepoint Analyses for UKRN affiliated universities only, students in years 1 and 2
 
 3.1 Scale Scores
 
@@ -469,6 +469,8 @@ allwaves %>%
 ```{r}
 
 allwaves %>%
+  filter(UKRN == "UKRN") %>%
+  filter(Current_Year %in% c("Year 1", "Year 2")) %>%
   select(timepoint, Perception_Score_Total) %>%
   ggplot(aes(x = timepoint, y = Perception_Score_Total)) +
   stat_halfeye(
@@ -499,6 +501,8 @@ allwaves %>%
 ```{r}
 
 allwaves %>%
+  filter(UKRN == "UKRN") %>%
+  filter(Current_Year %in% c("Year 1", "Year 2")) %>%
   select(timepoint, Perception_Score_Mean) %>%
   ggplot(aes(x = timepoint, y = Perception_Score_Mean)) +
   stat_halfeye(
@@ -529,6 +533,8 @@ allwaves %>%
 ```{r}
 
 allwaves %>%
+  filter(UKRN == "UKRN") %>%
+  filter(Current_Year %in% c("Year 1", "Year 2")) %>%
   select(timepoint, Knowledge_Score_Total) %>%
   ggplot(aes(x = timepoint, y = Knowledge_Score_Total)) +
   stat_halfeye(
@@ -559,6 +565,8 @@ allwaves %>%
 ```{r}
 
 allwaves %>%
+  filter(UKRN == "UKRN") %>%
+  filter(Current_Year %in% c("Year 1", "Year 2")) %>%
   select(timepoint, Knowledge_Score_Mean) %>%
   ggplot(aes(x = timepoint, y = Knowledge_Score_Mean)) +
   stat_halfeye(
@@ -588,6 +596,8 @@ allwaves %>%
 
 ```{r}
 allwaves <- allwaves %>%
+  filter(UKRN == "UKRN") %>%
+  filter(Current_Year %in% c("Year 1", "Year 2")) %>%
   mutate(timepoint = recode(timepoint, 
                             '1' = "Wave 1",
                             '2' = "Wave 2",
@@ -622,6 +632,8 @@ NOTE: is there something wrong with the Wave 3 data here that all are 8 or NA?
 ```{r}
 
 p2 <- allwaves %>%
+  filter(UKRN == "UKRN") %>%
+  filter(Current_Year %in% c("Year 1", "Year 2")) %>%
   select(timepoint, Experience_Score_Total) %>%
   ggplot(aes(x = timepoint, y = Experience_Score_Total, colour = timepoint)) +
   geom_boxplot(
@@ -648,7 +660,7 @@ p2
 
 p1 + p2
 
-ggsave("Figure 4.png", width = 10,)
+ggsave("Figure 4.eps", width = 10,)
 
 ```
 
@@ -658,6 +670,8 @@ ggsave("Figure 4.png", width = 10,)
 ```{r}
 
 allwaves %>%
+  filter(UKRN == "UKRN") %>%
+  filter(Current_Year %in% c("Year 1", "Year 2")) %>%
   select(timepoint, crisis_aware, os_explain, os_learnt, applicability) %>%
   pivot_longer(cols = -timepoint, 
                names_to = "Item",
@@ -685,6 +699,6 @@ allwaves %>%
   ylab("")
   
 
-ggsave("Figure 3.png")
+ggsave("Figure 3.eps")
   
 ```

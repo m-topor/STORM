@@ -41,7 +41,7 @@ The data were analysed on a Windows computer and the analyses have not been test
 Preparations:  
 * RStudio   
 * The scripts are written in RMarkdown, if you have not used markdown in R before, you will need to install packages: rmarkdown and knitr. Separately to RStudio, you should also install MikTex. MikTex is needed to save the output as a PDF. An alterntive solution is to change the output format to html (the first few lines of the code). Then MikTex will not be needed.    
-* Install the rstan package  
+* Install the rstan package version 2.26.23 with StanHeaders package version 2.26.28. The code uses the old stan syntax and will not work in rstan versions from 2.32 onwars. 
 * Install the ggplot2 package  
 
 Clone the repository to your computer and open the R project.   
